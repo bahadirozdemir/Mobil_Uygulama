@@ -21,12 +21,18 @@ export default Yorumlar = ({ route, navigation }) => {
   const { item } = route.params;
   const {user,arttir,setArttir} = useContext(AuthContext)
   const [Like, setLike] = useState(false);
+  const [currentuser, Setcurrentuser] = useState([]);
   const [namearray, setname] = useState([]);
+  const [imgarray, setimg] = useState([]);
   const [yorumdizi, setyorumdizi] = useState([]);
   const [isloading, Setloading] = useState(true);
   const [yorum, setyorum] = useState(true);
   let isimler = [];
+  let photourl = [];
   useEffect(() => {
+    firestore().collection("users").doc(user.uid).get().then((result)=>{
+      Setcurrentuser(result.data());
+    })
     firestore().collection('ilanlar').get().then(x => {
       x.forEach(element => {
         element.data().userilan.forEach(y=>{
@@ -39,10 +45,12 @@ export default Yorumlar = ({ route, navigation }) => {
                        if(y.yorumyapanid==x.id)
                        {
                          isimler.push(x.data().Name);
+                         photourl.push(x.data().Photo);
                        }
                     });
                  });
                  setname(isimler);
+                 setimg(photourl);
               })
              
         
@@ -80,6 +88,7 @@ export default Yorumlar = ({ route, navigation }) => {
                           }).then(basari=>{
                             console.log("Başarı Bir Şekilde Yorum Eklendi");
                             setyorum(!yorum);
+                            
                           })
                         }
                         
@@ -99,9 +108,9 @@ export default Yorumlar = ({ route, navigation }) => {
     return (
     <View style={{ backgroundColor: "#161616", flex: 1, justifyContent: "center", alignItems: "center" }}>
      
-
+ 
       <View key={index} style={{ justifyContent: "space-between", marginTop: 5, alignItems: "center", flexDirection: "row", height: 100, width:"90%", marginBottom: 20 }}>
-        <View style={{ width: 50, height: 50, alignItems: "center", justifyContent: "center", borderRadius: 50 }}><ImageBackground source={image} resizeMode="cover" imageStyle={{ borderRadius: 50 }} style={{ width: 50, height: 50, justifyContent: "center" }} /></View>
+        <View style={{ width: 50, height: 50, alignItems: "center", justifyContent: "center", borderRadius: 50 }}><ImageBackground source={{uri:imgarray[index]}} resizeMode="cover" imageStyle={{ borderRadius: 50 }} style={{ width: 50, height: 50, justifyContent: "center" }} /></View>
         <View style={{ width: 270, alignItems: "center", flexDirection: "column", justifyContent: "center" }}>
           <View style={{ marginBottom: 10 }}><Text style={{ fontWeight: "bold", color: "white", fontSize: 15 }}>{namearray[index]}</Text></View>
           <View style={{ width: "90%", justifyContent: "center", alignItems: "center" }}><Text style={{ color: "white" }}>{item.yorumicerik}</Text></View>
@@ -121,21 +130,21 @@ export default Yorumlar = ({ route, navigation }) => {
   }
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height - 80;
-  const image = { uri: "https://www.wpdurum.com/uploads/thumbs/anime-kiz-profil-resimleri-1.jpg" };
+  const image = {uri:currentuser.Photo};
   return (
     <View style={{flex:1,backgroundColor:"#161616"}}>
        <View style={{height:"9%",marginTop: 10, justifyContent: "center", alignItems: "center" }}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.baricon} />
         <Text style={{ color: "white", marginTop: 10, fontSize: 20 }}>Yorumlar</Text>
       </View>
-      {yorumdizi.length > 0 ? (<FlatList data={yorumdizi} renderItem={(item, index) => fonksiyonpage(item, index)} pagingEnabled />) : ""}
+      {yorumdizi.length > 0 ? (<FlatList data={yorumdizi} renderItem={(item, index) => fonksiyonpage(item, index)}/>) : ""}
       {yorumdizi.length == 0 ? <View style={{ width: "100%", height: "80%", justifyContent: "center", alignItems: "center" }}><Text style={{ color: "white", fontSize: 30, fontWeight: "bold" }}>Henüz Yorum Yok</Text></View> : ""}
       <View style={{ borderTopLeftRadius: 20, borderTopRightRadius: 20, backgroundColor: "#353535", width: "100%", height: "10%", flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
         <View style={{ width: 50, height: 50, alignItems: "center", justifyContent: "center", borderRadius: 50 }}><ImageBackground source={image} resizeMode="cover" imageStyle={{ borderRadius: 50 }} style={{ width: 50, height: 50, justifyContent: "center" }} /></View>
         <Formik
           initialValues={{yorum:""}}
           validationSchema={registerSchema}
-          onSubmit={(values) => yorumekle(values.yorum)}>
+          onSubmit={(values,{resetForm}) => {yorumekle(values.yorum);resetForm()}}>
           {({ handleChange, handleBlur, handleSubmit, values,errors }) => (
             <>
               <TextInput

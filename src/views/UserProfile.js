@@ -1,46 +1,138 @@
-import React,{useState,useEffect,useContext} from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from '../navigation/AuthProvider';
-import { StyleSheet, Text, View, SafeAreaView, Image, ScrollView } from "react-native";
+import { StyleSheet, Text, View, SafeAreaView, Image, ScrollView, TouchableOpacity } from "react-native";
 import Icon from 'react-native-vector-icons/AntDesign'
 import Icones from 'react-native-vector-icons/SimpleLineIcons'
 import Load from '../utils/Loading'
 import firestore from '@react-native-firebase/firestore'
-export default function UserProfile({route}) {
+import storage from '@react-native-firebase/storage'
+import { Button, Paragraph, Dialog, Portal, Provider, ActivityIndicator, MD2Colors } from 'react-native-paper';
+
+export default function UserProfile({ route }) {
+    const { user } = useContext(AuthContext);
     const [currentuser, Setcurrentuser] = useState([]);
     const [count, setCount] = useState()
+    const [Takipikon, setTakipicon] = useState()
+    const [TakipCount, setTakipCount] = useState()
+    const [TakipciCount, setTakipciCount] = useState()
+    const [Currentilanlar, setCurrentilanlar] = useState([])
+    const [ilanlarphotoUrl, setilanlarphotourl] = useState([])
+    const [Loading, Setloading] = useState(true)
     const veriler = route.params;
+    const [visible, setVisible] = React.useState(false);
+
+    const showDialog = () => setVisible(true);
+
+    const hideDialog = () => setVisible(false);
     useEffect(() => {
-      firestore().collection("users").doc(veriler).get().then(result=>{
-         Setcurrentuser(result.data());
-      })
-      firestore().collection("ilanlar").doc(veriler).get().then(veri=>{
-        setCount(veri.data().userilan.length);
-      })
+
+        firestore().collection("users").doc(veriler).get().then(result => {
+            Setcurrentuser(result.data());
+            if (result.data().Takipci.indexOf(user.uid) == -1) {
+                setTakipicon('user-follow')
+            }
+            else {
+                setTakipicon('user-unfollow')
+            }
+            setTakipciCount(result.data().Takipci.length);
+            setTakipCount(result.data().Takip.length);
+        })
+
+        firestore().collection("ilanlar").doc(veriler).get().then(veri => {
+            setCount(veri.data().userilan.length);
+            let resimler = [];
+            veri.data().userilan.forEach(async (element, index) => {
+                const url = await storage().ref("Uploads/" + veriler + "/ilanResimleri/" + element.ilanid + "/data0").getDownloadURL();
+                resimler.push(url);
+                if (index == (veri.data().userilan.length - 1)) {
+
+                    setilanlarphotourl(resimler);
+                    setTimeout(() => {
+                        Setloading(false);
+                    }, 1500);
+                }
+            })
+        })
     }, [])
+    const takipet = () => {
+        firestore().collection("users").doc(veriler).get().then(result => {
+            let takipcidizi = result.data().Takipci;
+            if (takipcidizi.indexOf(user.uid) == -1) {
+                takipcidizi.push(user.uid);
+                firestore().collection("users").doc(veriler).update({
+                    Takipci: takipcidizi,
+                }).then(() => {
+                    console.log("Takipçi Başarıyla Eklendi");
+                    firestore().collection("users").doc(user.uid).get().then(Takipdizi=>{
+                        let takipekle = Takipdizi.data().Takip;
+                        takipekle.push(veriler);
+                        firestore().collection("users").doc(user.uid).update({
+                            Takip:takipekle,
+                        })
+                        console.log("Takip Başarıyla Eklendi")
+                    })
+                    setTakipicon('user-unfollow')
+                    setTakipciCount(result.data().Takipci.length);
+                })
+            }
+            else {
+                showDialog()
+
+            }
+        })
+    }
+    const TakiptenCikar = () => {
+        firestore().collection("users").doc(veriler).get().then(result => {
+            let takipcidizi = result.data().Takipci;
+            const index = takipcidizi.indexOf(user.uid);
+            takipcidizi.splice(index, 1);
+            firestore().collection("users").doc(veriler).update({
+                Takipci: takipcidizi,
+            }).then(() => {
+                console.log("Takipçi Başarıyla Kaldırıldı");
+                firestore().collection("users").doc(user.uid).get().then(Takipdizi=>{
+                    let takipekle = Takipdizi.data().Takip;
+                    const index = takipekle.indexOf(user.uid);
+                    takipekle.splice(index, 1);
+                    firestore().collection("users").doc(user.uid).update({
+                        Takip:takipekle,
+                    })
+                    console.log("Takip Başarıyla Kaldırıldı")
+                })
+                setTakipicon('user-follow');
+                setTakipciCount(result.data().Takipci.length);
+                hideDialog();
+            })
+        })
+    }
     return (
 
 
         <SafeAreaView style={styles.container}>
+
             <ScrollView showsVerticalScrollIndicator={false}>
+
                 <View style={styles.titleBar}>
 
                 </View>
-
                 <View style={{ alignSelf: "center" }}>
                     <View style={styles.profileImage}>
-                        <Image source={{uri:currentuser.Photo}} style={styles.image} resizeMode="cover"></Image>
+                        <Image source={{ uri: currentuser.Photo }} style={styles.image} resizeMode="cover"></Image>
                     </View>
+                    {user.uid==veriler ? "" :  
                     <View style={styles.dm}>
                         <Icon name="message1" size={25} color="white" />
                     </View>
-                    <View style={styles.active}></View>
-                    <View style={styles.add}>
-                        <Icones name="user-follow" size={25} color="white" />
-                    </View>
+                   }
+                    {user.uid==veriler ? "" :  
+                     <TouchableOpacity onPress={takipet} style={styles.add}>
+                      <Icones name={Takipikon} size={25} color="white" />
+                    </TouchableOpacity>} 
+                  
                 </View>
 
                 <View style={styles.infoContainer}>
-                    <Text style={[styles.text, { fontWeight: "200", fontSize: 36 }]}>{currentuser.Name +" "+ currentuser.Surname}</Text>
+                    <Text style={[styles.text, { fontWeight: "200", fontSize: 36 }]}>{currentuser.Name=="" ? "" :currentuser.Name} {currentuser.Surname=="" ? "": currentuser.Surname}</Text>
                     <Text style={[styles.text, { color: "#AEB5BC", fontSize: 14 }]}>Üye</Text>
                 </View>
 
@@ -50,27 +142,44 @@ export default function UserProfile({route}) {
                         <Text style={[styles.text, styles.subText]}>İlan</Text>
                     </View>
                     <View style={[styles.statsBox, { borderColor: "#DFD8C8", borderLeftWidth: 1, borderRightWidth: 1 }]}>
-                        <Text style={[styles.text, { fontSize: 24 }]}>{currentuser.Takipci}</Text>
+                        <Text style={[styles.text, { fontSize: 24 }]}>{TakipciCount}</Text>
                         <Text style={[styles.text, styles.subText]}>Takipçi</Text>
                     </View>
                     <View style={styles.statsBox}>
-                        <Text style={[styles.text, { fontSize: 24 }]}>{currentuser.Takip}</Text>
+                        <Text style={[styles.text, { fontSize: 24 }]}>{TakipCount}</Text>
                         <Text style={[styles.text, styles.subText]}>Takip</Text>
                     </View>
                 </View>
 
-                <View style={{ marginTop: 32, width: "100%", justifyContent: "flex-start", alignItems: "center", flexDirection: "row", flexWrap: "wrap" }}>
-                    <View style={styles.mediaImageContainer}>
-                        <Image source={require("../assets/profiles/media1.jpg")} style={styles.image} resizeMode="cover"></Image>
-                    </View>
-                    <View style={styles.mediaImageContainer}>
-                        <Image source={require("../assets/profiles/media2.jpg")} style={styles.image} resizeMode="cover"></Image>
-                    </View>
-                    <View style={styles.mediaImageContainer}>
-                        <Image source={require("../assets/profiles/media3.jpg")} style={styles.image} resizeMode="cover"></Image>
-                    </View>
-                </View>
+                {Loading == true ? (<View style={{ marginTop: 32, width: "100%",justifyContent: "center", alignItems: "center" }}><ActivityIndicator animating={true} color={MD2Colors.red800} /></View>) : (<View style={{ marginTop: 32, width: "100%", justifyContent: "flex-start", alignItems: "center", flexDirection: "row", flexWrap: "wrap" }}>
+                    {
+                        ilanlarphotoUrl.map((element, value) => (
+                            <View key={value} style={styles.mediaImageContainer}>
+                                <Image source={{ uri: element }} style={styles.image} resizeMode="cover"></Image>
+                            </View>
+                        ))
+                    }
 
+
+                </View>)}
+
+
+                <Provider>
+                    <View>
+                        <Portal>
+                            <Dialog style={{backgroundColor:"white"}} visible={visible} onDismiss={hideDialog}>
+                                <Dialog.Title>Uyarı</Dialog.Title>
+                                <Dialog.Content>
+                                    <Paragraph>Bu Kullanıcıyı Takip Etmeyi Bırakmak İstediğinize Emin Misiniz?</Paragraph>
+                                </Dialog.Content>
+                                <Dialog.Actions>
+                                    <Button onPress={TakiptenCikar}>Evet</Button>
+                                    <Button onPress={hideDialog}>Hayır</Button>
+                                </Dialog.Actions>
+                            </Dialog>
+                        </Portal>
+                    </View>
+                </Provider>
             </ScrollView>
         </SafeAreaView>
     );
@@ -154,7 +263,7 @@ const styles = StyleSheet.create({
         flex: 1
     },
     mediaImageContainer: {
-        width: 176,
+        width: '43%',
         height: 200,
         borderRadius: 12,
         overflow: "hidden",

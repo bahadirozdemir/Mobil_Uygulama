@@ -52,8 +52,8 @@ export const AuthProvider = ({children}) => {
                                Ulke:"",
                                Telefon:"",
                                Photo:"",
-                               Takip:0,
-                               Takipci:0,
+                               Takip:[],
+                               Takipci:[],
                                KayitTarihi:(new Date().getDate()+1)+"."+(new Date().getMonth()+1)+"."+new Date().getFullYear()
                             });
                         });

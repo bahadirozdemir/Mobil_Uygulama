@@ -15,6 +15,7 @@ import IlanYukleniyor from '../utils/IlanYukleniyor'
 import SelectCountry from '../views/SelectCountry'
 import Phone from '../views/Phone'
 import Dtarihi from '../views/Dtarihi'
+
 export default Routes = () => {
   const Stack = createStackNavigator();
   const { SignOut } = useContext(AuthContext);

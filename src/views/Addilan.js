@@ -438,10 +438,12 @@ export default Addilan = ({ navigation }) => {
       YakitTipi: values.yakitipi,
       ilanid: "",
       ilanTarihi:(new Date().getDate())+"."+(new Date().getMonth()+1)+"."+new Date().getFullYear(),
+      ilanTarihiZaman:Date.now(),
       ilanyapan: "",
       ilanyapanid: "",
       Begenenler: [],
       Yorumlar: [],
+      
     }]
     let unique = uuid.v4();
     let ilandizisi = [];

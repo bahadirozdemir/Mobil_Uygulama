@@ -1,5 +1,5 @@
 import React, { Component, useContext, useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity, ImageBackground, Button, PermissionsAndroid } from 'react-native';
+import { StyleSheet, Text, View, Image,ScrollView,TouchableOpacity, ImageBackground, Button, PermissionsAndroid } from 'react-native';
 import { AuthContext } from '../navigation/AuthProvider';
 import firestore from '@react-native-firebase/firestore';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -10,6 +10,7 @@ import Myilanlar from './Myilanlar'
 import Ant from 'react-native-vector-icons/AntDesign'
 import storage from '@react-native-firebase/storage'
 import { utils } from '@react-native-firebase/app';
+ 
 const ImagePicker = require('react-native-image-picker');
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -83,7 +84,7 @@ const Profil = ({ navigation }) => {
 
     return (
         
-       
+       <ScrollView>
         <View style={styles.container}>   
             <View style={styles.header}>
                 <ImageBackground source={{ uri: 'https://i.pinimg.com/originals/01/47/bf/0147bfd9753a8633861c9905f6c0f89e.jpg' }} resizeMode="cover" style={styles.image}></ImageBackground>
@@ -124,7 +125,7 @@ const Profil = ({ navigation }) => {
             </View>
 
         </View>
-       
+        </ScrollView>
     )
 }
 

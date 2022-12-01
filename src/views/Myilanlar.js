@@ -23,10 +23,8 @@ export default Myilanlar = ({ navigation }) => {
   const showDialog = () => setVisible(true);
   const hideDialog = () => setVisible(false);
   const ilanSil = (item) => {
-    firestore().collection("ilanlar").doc(user.uid).update({
-      userilan: firestore.FieldValue.arrayRemove(item)
-    }).then(() => {
-      console.log("Document successfully updated!");
+    firestore().collection("ilanlar").doc(item.ilanid).delete().then(() => {
+      console.log("Document successfully Removed!");
       for (let index = 0; index < 4; index++) {
         let imageRef = storage().ref('Uploads/' + user.uid + '/ilanResimleri/' + item.ilanid + '/data' + index);
         imageRef.delete().then(() => {
@@ -34,17 +32,25 @@ export default Myilanlar = ({ navigation }) => {
           hideDialog();
         }).catch((e) => console.log(e));
       }
-      firestore().collection("ilanlar").doc(user.uid).get().then((response) => {
-        setilanDizi(response.data().userilan);
-      }).catch((e) => {
-        setError("Henüz Bir İlan Eklemediniz");
-      })
+      let ilanbilgilerim = [];
+       firestore().collection("ilanlar").where("ilanyapanid","==",user.uid).get().then((response) => {
+         response.forEach(element=>{
+              ilanbilgilerim.push(element.data());
+         })
+       }).catch((e) => {
+         setError("Henüz Bir İlan Eklemediniz");
+       })
+       ilanbilgilerim.sort((a,b)=>{
+         return b.ilanTarihiZaman-a.ilanTarihiZaman;     
+       });
+       setilanDizi(ilanbilgilerim);
     }).catch((error) => {
       console.log(error);
     });
   }
   const Gecmisİlanlarim = ({ item, index }) => {
     return (
+
       <View style={{ flex: 1, alignItems: "center", flexDirection: "column", backgroundColor: "#f1f1f1" }}>
         <View style={{ width: "100%", justifyContent: "center", alignItems: "center", margin: 15, }}>
           <Card style={{ backgroundColor: "white", width: "90%" }}>
@@ -73,22 +79,41 @@ export default Myilanlar = ({ navigation }) => {
       </View>
     )
   }
-  const sayfayenile = () => {
+  const sayfayenile = async () => {
+    let ilanbilgilerim=[];
     setrefresh(true);
-    firestore().collection("ilanlar").doc(user.uid).get().then((response) => {
-      setilanDizi(response.data().userilan);
-      setrefresh(false);
+    await firestore().collection("ilanlar").where("ilanyapanid","==",user.uid).get().then((response) => {
+      response.forEach(element=>{
+           ilanbilgilerim.push(element.data());
+      })
     }).catch((e) => {
       setError("Henüz Bir İlan Eklemediniz");
       setrefresh(false);
     })
+    ilanbilgilerim.sort((a,b)=>{
+      return b.ilanTarihiZaman-a.ilanTarihiZaman;     
+    });
+    setilanDizi(ilanbilgilerim);
+    setrefresh(false);
   }
   useEffect(() => {
-    firestore().collection("ilanlar").doc(user.uid).get().then((response) => {
-      setilanDizi(response.data().userilan);
-    }).catch((e) => {
-      setError("Henüz Bir İlan Eklemediniz");
-    })
+    const ilanlarigetir=async ()=>
+    {
+     let ilanbilgilerim = [];
+     await firestore().collection("ilanlar").where("ilanyapanid","==",user.uid).get().then((response) => {
+        response.forEach(element=>{
+             ilanbilgilerim.push(element.data());
+        })
+      }).catch((e) => {
+        setError("Henüz Bir İlan Eklemediniz");
+      })
+      ilanbilgilerim.sort((a,b)=>{
+        return b.ilanTarihiZaman-a.ilanTarihiZaman;     
+      });
+      setilanDizi(ilanbilgilerim);
+    }
+    ilanlarigetir();
+   
   }, [])
   return (
     <View style={{flex:1}}>
@@ -106,7 +131,7 @@ export default Myilanlar = ({ navigation }) => {
         </View>
       </View>
       {ilandizi.length > 0 ? (<FlatList refreshControl={<RefreshControl refreshing={refresh} onRefresh={sayfayenile} />} data={ilandizi} renderItem={(item, index) => Gecmisİlanlarim(item, index)} />) : ""}
-      {ilandizi.length == 0 ? (<FlatList refreshControl={<RefreshControl refreshing={refresh} onRefresh={sayfayenile} />} data={hatadizi} renderItem={(item, index) => Hata(item, index)} />) : ""}
+      {ilandizi.length == 0 ? (<FlatList refreshControl={<RefreshControl refreshing={refresh} onRefresh={sayfayenile} />} data={hatadizi} renderItem={(item, index) => Hata(item, index)} />) : ""} 
       <Provider>
         <View>
           <Portal>

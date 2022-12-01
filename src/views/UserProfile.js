@@ -26,7 +26,7 @@ export default function UserProfile({ route }) {
     const hideDialog = () => setVisible(false);
     useEffect(() => {
 
-        firestore().collection("users").doc(veriler).get().then(result => {
+        firestore().collection("users").doc(veriler.ilanyapan).get().then(result => {
             Setcurrentuser(result.data());
             if (result.data().Takipci.indexOf(user.uid) == -1) {
                 setTakipicon('user-follow')
@@ -38,34 +38,39 @@ export default function UserProfile({ route }) {
             setTakipCount(result.data().Takip.length);
         })
 
-        firestore().collection("ilanlar").doc(veriler).get().then(veri => {
-            setCount(veri.data().userilan.length);
-            let resimler = [];
-            veri.data().userilan.forEach(async (element, index) => {
-                const url = await storage().ref("Uploads/" + veriler + "/ilanResimleri/" + element.ilanid + "/data0").getDownloadURL();
-                resimler.push(url);
-                if (index == (veri.data().userilan.length - 1)) {
+        firestore().collection("ilanlar").where("ilanyapanid","==",veriler.ilanyapan).get().then(veri => {
+           let sayac=0;
+           veri.forEach(element => {
+              sayac++;
+           });
+           setCount(sayac);
+           let resimler = [];
+           veri.forEach(async (element, index) => {
+               const url = await storage().ref("Uploads/" + veriler.ilanyapan + "/ilanResimleri/" + element.data().ilanid + "/data0").getDownloadURL();
+               resimler.push(url);
+               if (index == (sayac-1)) {
 
-                    setilanlarphotourl(resimler);
-                    setTimeout(() => {
-                        Setloading(false);
-                    }, 1500);
-                }
-            })
+                   setilanlarphotourl(resimler);
+                   setTimeout(() => {
+                       Setloading(false);
+                   }, 1500);
+               }
+           })
+           
         })
     }, [])
     const takipet = () => {
-        firestore().collection("users").doc(veriler).get().then(result => {
+        firestore().collection("users").doc(veriler.ilanyapan).get().then(result => {
             let takipcidizi = result.data().Takipci;
             if (takipcidizi.indexOf(user.uid) == -1) {
                 takipcidizi.push(user.uid);
-                firestore().collection("users").doc(veriler).update({
+                firestore().collection("users").doc(veriler.ilanyapan).update({
                     Takipci: takipcidizi,
                 }).then(() => {
                     console.log("Takipçi Başarıyla Eklendi");
                     firestore().collection("users").doc(user.uid).get().then(Takipdizi=>{
                         let takipekle = Takipdizi.data().Takip;
-                        takipekle.push(veriler);
+                        takipekle.push(veriler.ilanyapan);
                         firestore().collection("users").doc(user.uid).update({
                             Takip:takipekle,
                         })
@@ -82,7 +87,7 @@ export default function UserProfile({ route }) {
         })
     }
     const TakiptenCikar = () => {
-        firestore().collection("users").doc(veriler).get().then(result => {
+        firestore().collection("users").doc(veriler.ilanyapan).get().then(result => {
             let takipcidizi = result.data().Takipci;
             const index = takipcidizi.indexOf(user.uid);
             takipcidizi.splice(index, 1);
@@ -119,12 +124,12 @@ export default function UserProfile({ route }) {
                     <View style={styles.profileImage}>
                         <Image source={{ uri: currentuser.Photo }} style={styles.image} resizeMode="cover"></Image>
                     </View>
-                    {user.uid==veriler ? "" :  
+                    {user.uid==veriler.ilanyapan ? "" :  
                     <View style={styles.dm}>
                         <Icon name="message1" size={25} color="white" />
                     </View>
                    }
-                    {user.uid==veriler ? "" :  
+                    {user.uid==veriler.ilanyapan ? "" :  
                      <TouchableOpacity onPress={takipet} style={styles.add}>
                       <Icones name={Takipikon} size={25} color="white" />
                     </TouchableOpacity>} 

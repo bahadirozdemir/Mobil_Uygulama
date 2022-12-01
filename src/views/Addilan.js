@@ -79,7 +79,10 @@ let arabalar = [
       '335i',
       '335xi',
       '520i',
-      '5.25d'
+      '5.25d',
+      'M4',
+      'M5',
+      'M3'
     ]
   },
   {
@@ -369,7 +372,7 @@ export default Addilan = ({ navigation }) => {
 
   useEffect(() => {
     //Kullanıcıyı Al
-    firestore().collection("users").doc(user.uid).get().then(response=>{
+    firestore().collection("users").doc(user.uid).get().then(response => {
       Setcurrentuser(response.data())
     })
     // Yıl Dizisini Ayarlamak
@@ -436,20 +439,19 @@ export default Addilan = ({ navigation }) => {
       Takas: values.takas,
       Vites: values.vites,
       YakitTipi: values.yakitipi,
-      ilanid: "",
-      ilanTarihi:(new Date().getDate())+"."+(new Date().getMonth()+1)+"."+new Date().getFullYear(),
-      ilanTarihiZaman:Date.now(),
+      ilanTarihi: (new Date().getDate()) + "." + (new Date().getMonth() + 1) + "." + new Date().getFullYear(),
+      ilanTarihiZaman: Date.now(),
       ilanyapan: "",
       ilanyapanid: "",
       Begenenler: [],
       Yorumlar: [],
-      
+
     }]
     let unique = uuid.v4();
     let ilandizisi = [];
     firestore().collection("ilanlar").get().then(result => {
       result.forEach(element => {
-        ilandizisi = element.data().userilan;
+        ilandizisi = element.data();
       });
     })
     while (whilecheck) {
@@ -461,7 +463,6 @@ export default Addilan = ({ navigation }) => {
 
       })
       if (check == 0) {
-        x[0].ilanid = unique;
         x[0].ilanyapan = currentuser.Name + " " + currentuser.Surname;
         x[0].ilanyapanid = user.uid;
         whilecheck = false;
@@ -472,35 +473,45 @@ export default Addilan = ({ navigation }) => {
     let checkuser = false;
 
     const veritabaninaekle = async () => {
-      await firestore().collection("ilanlar").get().then(async (veriler) => {
-        veriler.forEach(element => {
-          if (user.uid == element.id) {
-            checkuser = true;
-            firestore().doc("ilanlar/" + user.uid).update({
-              userilan: firestore.FieldValue.arrayUnion(...x)
-            }).then(result => {
-              console.log("Update Edildi")
-              for(let index=0;index < 4;index++)
-              {
-              resimlerigonder(index).then(q => {           
-              })
-            } 
+      await firestore().collection("ilanlar").doc(unique).set({
+        ilanBaslik: values.ilanbasligi,
+        Cekis: values.cekis,
+        Marka: values.marka,
+        Model: values.model,
+        Fiyat: values.fiyat,
+        KasaTipi: values.kasatipi,
+        Kilometre: values.kilometre,
+        Modelyil: values.modelyil,
+        Motorgucu: values.motorgucu,
+        Takas: values.takas,
+        Vites: values.vites,
+        YakitTipi: values.yakitipi,
+        ilanTarihi: (new Date().getDate()) + "." + (new Date().getMonth() + 1) + "." + new Date().getFullYear(),
+        ilanTarihiZaman: Date.now(),
+        ilanyapan: x[0].ilanyapan,
+        ilanyapanid: x[0].ilanyapanid,
+        ilanid:unique,
+        Begenenler: unique,
+        Yorumlar: unique,
+      }).then(async () => {
+        for(let index=0;index < 4;index++)
+            {
+              resimlerigonder(index).then(q => {   
+                console.log("Fotoğraf"+index+"Eklendi");      
             })
           }
+        await firestore().collection("Yorumlar").doc(unique).set({
+          Yorumlar:[]
+        }).then(() => {
+          console.log("Yorumlar dizisi eklendi");
         })
-        if (checkuser == false) {
-          firestore().doc("ilanlar/" + user.uid).set({
-            userilan: firestore.FieldValue.arrayUnion(...x)
-          }).then(result => {
-            console.log("Sıfırdan Eklendi")
-            for(let index=0;index < 4;index++)
-            {
-              resimlerigonder(index).then(q => {           
-            })
-          } 
-          })
-        }
+        await firestore().collection("Begeniler").doc(unique).set({
+          Begenenler:[]
+        }).then(() => {
+          console.log("Begeniler Dizisi Eklendi");
+        })
       })
+     console.log("İlan Tamamen Yüklendi");
     }
     veritabaninaekle();
     resimleradi = ["Resim1", "Resim2", "Resim3", "Resim4"];
@@ -518,12 +529,9 @@ export default Addilan = ({ navigation }) => {
             reject("Url Boş Döndü")
           }
         })
-       
+
       })
-
-
-
-
+  
     }
     whilecheck = true;
     navigation.navigate('Loadingilan');

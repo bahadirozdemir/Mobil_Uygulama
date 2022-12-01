@@ -18,8 +18,8 @@ const registerSchema = yup.object().shape(
 )
 export default Yorumlar = ({ route, navigation }) => {
   let begendizi = [];
-  const { item } = route.params;
-  const {user,arttir,setArttir} = useContext(AuthContext)
+  const ilanid = route.params;
+  const { user, arttir, setArttir } = useContext(AuthContext)
   const [Like, setLike] = useState(false);
   const [currentuser, Setcurrentuser] = useState([]);
   const [namearray, setname] = useState([]);
@@ -30,122 +30,90 @@ export default Yorumlar = ({ route, navigation }) => {
   let isimler = [];
   let photourl = [];
   useEffect(() => {
-    firestore().collection("users").doc(user.uid).get().then((result)=>{
+    firestore().collection("users").doc(user.uid).get().then((result) => {
       Setcurrentuser(result.data());
     })
-    firestore().collection('ilanlar').get().then(x => {
-      x.forEach(element => {
-        element.data().userilan.forEach(y=>{
-            if(y.ilanid==item.ilanid)
-            {
-              setyorumdizi(y.Yorumlar);
-              firestore().collection("users").get().then(users=>{
-                 users.forEach(x => {
-                    y.Yorumlar.forEach(y => {
-                       if(y.yorumyapanid==x.id)
-                       {
-                         isimler.push(x.data().Name);
-                         photourl.push(x.data().Photo);
-                       }
-                    });
-                 });
-                 setname(isimler);
-                 setimg(photourl);
-              })
-             
-        
-            }
-        })
+    firestore().collection('Yorumlar').doc(ilanid).get().then(verim => {
+        setyorumdizi(verim.data().Yorumlar);
+        firestore().collection("users").get().then(users=>{
+          users.forEach(x => {
+            verim.data().Yorumlar.forEach(y => {
+                if(y.yorumyapanid==x.id)
+                {
+                  isimler.push(x.data().Name);
+                  photourl.push(x.data().Photo);
+                }
+             });
+          });
+          setname(isimler);
+          setimg(photourl);
+        });
+        Setloading(false);
       });
     
-      Setloading(false);
-    });
+   
   }, [yorum])
 
   if (isloading == true) {
     return <Commentloading />
   }
-  const yorumekle=(veri)=>{
-     firestore().collection("ilanlar").get().then(result=>{
-       result.forEach(element => {
-           firestore().collection("ilanlar").doc(element.id).get().then(ar=>{
-              ar.data().userilan.forEach(a => {
-                 if(item.ilanid==a.ilanid)
-                 {
-                    firestore().collection("ilanlar").doc(element.id).get().then(geridonendizi=>{
-                      let x;
-                      x=geridonendizi.data().userilan;
-                      x.forEach((dizim,index) => {
-                        if(dizim.ilanid==item.ilanid)
-                        {
-                          let y={
-                            yorumicerik:veri,
-                            yorumyapanid:user.uid
-                          }
-                          x[index].Yorumlar.push(y);
-                          firestore().collection("ilanlar").doc(element.id).update({
-                            userilan:x
-                          }).then(basari=>{
-                            console.log("Başarı Bir Şekilde Yorum Eklendi");
-                            setyorum(!yorum);
-                            
-                          })
-                        }
-                        
-                      });
-                       
-                    })                
-                 }
-              }); 
-           })
-       });
-       
-     })
-     
+  const yorumekle = async (veri) => {
+    let y = [
+      {
+        yorumicerik: veri,
+        yorumyapanid: user.uid
+      }
+    ]
+      await firestore().collection("Yorumlar").doc(ilanid).update({
+        Yorumlar: firestore.FieldValue.arrayUnion(...y)
+      }).then(basari => {
+        console.log("Başarı Bir Şekilde Yorum Eklendi");
+        setyorum(!yorum);
+      })
   }
   const fonksiyonpage = ({ item, index }) => {
     //console.log(index);
     return (
-    <View style={{ backgroundColor: "#161616", flex: 1, justifyContent: "center", alignItems: "center" }}>
-     
- 
-      <View key={index} style={{ justifyContent: "space-between", marginTop: 5, alignItems: "center", flexDirection: "row", height: 100, width:"90%", marginBottom: 20 }}>
-        <View style={{ width: 50, height: 50, alignItems: "center", justifyContent: "center", borderRadius: 50 }}><ImageBackground source={{uri:imgarray[index]}} resizeMode="cover" imageStyle={{ borderRadius: 50 }} style={{ width: 50, height: 50, justifyContent: "center" }} /></View>
-        <View style={{ width: 270, alignItems: "center", flexDirection: "column", justifyContent: "center" }}>
-          <View style={{ marginBottom: 10 }}><Text style={{ fontWeight: "bold", color: "white", fontSize: 15 }}>{namearray[index]}</Text></View>
-          <View style={{ width: "90%", justifyContent: "center", alignItems: "center" }}><Text style={{ color: "white" }}>{item.yorumicerik}</Text></View>
-          <View style={{ width: "100%", marginTop: 8, flexDirection: "row", alignItems: "center", justifyContent: "space-evenly" }}>
-            <View><Text style={{ color: "gray", fontSize: 13 }}>14 Saat Önce</Text></View>
-            <View><Text style={{ color: "gray", fontSize: 13 }}>1 Beğenme</Text></View>
+      <View style={{ backgroundColor: "#161616", flex: 1, justifyContent: "center", alignItems: "center" }}>
+
+
+        <View key={index} style={{ justifyContent: "space-between", marginTop: 5, alignItems: "center", flexDirection: "row", height: 100, width: "90%", marginBottom: 20 }}>
+          <View style={{ width: 50, height: 50, alignItems: "center", justifyContent: "center", borderRadius: 50 }}><ImageBackground source={{ uri: imgarray[index] }} resizeMode="cover" imageStyle={{ borderRadius: 50 }} style={{ width: 50, height: 50, justifyContent: "center" }} /></View>
+          <View style={{ width: 270, alignItems: "center", flexDirection: "column", justifyContent: "center" }}>
+            <View style={{ marginBottom: 10 }}><Text style={{ fontWeight: "bold", color: "white", fontSize: 15 }}>{namearray[index]}</Text></View>
+            <View style={{ width: "90%", justifyContent: "center", alignItems: "center" }}><Text style={{ color: "white" }}>{item.yorumicerik}</Text></View>
+            <View style={{ width: "100%", marginTop: 8, flexDirection: "row", alignItems: "center", justifyContent: "space-evenly" }}>
+              <View><Text style={{ color: "gray", fontSize: 13 }}>14 Saat Önce</Text></View>
+              <View><Text style={{ color: "gray", fontSize: 13 }}>1 Beğenme</Text></View>
+            </View>
           </View>
+
+          <TouchableOpacity
+
+          ><Awesome color={Like == true ? "red" : "white"} name={Like == true ? "heart" : "heart-o"} size={15} /></TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-
-        ><Awesome color={Like == true ? "red" : "white"} name={Like == true ? "heart" : "heart-o"} size={15} /></TouchableOpacity>
       </View>
-
-    </View>
     )
   }
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height - 80;
-  const image = {uri:currentuser.Photo};
+  const image = { uri: currentuser.Photo };
   return (
-    <View style={{flex:1,backgroundColor:"#161616"}}>
-       <View style={{height:"9%",marginTop: 10, justifyContent: "center", alignItems: "center" }}>
+    <View style={{ flex: 1, backgroundColor: "#161616" }}>
+      <View style={{ height: "9%", marginTop: 10, justifyContent: "center", alignItems: "center" }}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.baricon} />
         <Text style={{ color: "white", marginTop: 10, fontSize: 20 }}>Yorumlar</Text>
       </View>
-      {yorumdizi.length > 0 ? (<FlatList data={yorumdizi} renderItem={(item, index) => fonksiyonpage(item, index)}/>) : ""}
+      {yorumdizi.length > 0 ? (<FlatList data={yorumdizi} renderItem={(item, index) => fonksiyonpage(item, index)} />) : ""}
       {yorumdizi.length == 0 ? <View style={{ width: "100%", height: "80%", justifyContent: "center", alignItems: "center" }}><Text style={{ color: "white", fontSize: 30, fontWeight: "bold" }}>Henüz Yorum Yok</Text></View> : ""}
       <View style={{ borderTopLeftRadius: 20, borderTopRightRadius: 20, backgroundColor: "#353535", width: "100%", height: "10%", flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
         <View style={{ width: 50, height: 50, alignItems: "center", justifyContent: "center", borderRadius: 50 }}><ImageBackground source={image} resizeMode="cover" imageStyle={{ borderRadius: 50 }} style={{ width: 50, height: 50, justifyContent: "center" }} /></View>
         <Formik
-          initialValues={{yorum:""}}
+          initialValues={{ yorum: "" }}
           validationSchema={registerSchema}
-          onSubmit={(values,{resetForm}) => {yorumekle(values.yorum);resetForm()}}>
-          {({ handleChange, handleBlur, handleSubmit, values,errors }) => (
+          onSubmit={(values, { resetForm }) => { yorumekle(values.yorum); resetForm() }}>
+          {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
             <>
               <TextInput
                 name="yorum"
@@ -157,12 +125,12 @@ export default Yorumlar = ({ route, navigation }) => {
                 value={values.yorum}
                 keyboardType="default"
               />
-               <TouchableOpacity onPress={handleSubmit} style={{ width: 40, height: 40, justifyContent: "center", alignItems: "center" }}><Ant name="send" size={27} color={"#f1f1f1"} /></TouchableOpacity>
+              <TouchableOpacity onPress={handleSubmit} style={{ width: 40, height: 40, justifyContent: "center", alignItems: "center" }}><Ant name="send" size={27} color={"#f1f1f1"} /></TouchableOpacity>
             </>
           )}
-         
+
         </Formik>
-       
+
       </View>
     </View>
   )

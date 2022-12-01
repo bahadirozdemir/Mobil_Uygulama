@@ -56,10 +56,10 @@ const Profil = ({ navigation }) => {
         ImagePicker.launchImageLibrary({ mediaType: "photo" }, (response) => {
             if (!response.didCancel) {
                 SetUploading(true);
-                const ref = storage().ref("Uploads/" + user.uid);
+                const ref = storage().ref("Uploads/" + user.uid+"/ProfilFoto");
                 const task = ref.putFile(response.assets[0].uri);
                 task.then(async (cevap) => {
-                    const url = await storage().ref("Uploads/" + user.uid).getDownloadURL();
+                    const url = await storage().ref("Uploads/" + user.uid+"/ProfilFoto").getDownloadURL();
 
                     firestore().collection("users").doc(user.uid).update({
                         Photo: url

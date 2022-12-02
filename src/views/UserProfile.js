@@ -28,7 +28,7 @@ export default function UserProfile({ route }) {
     useEffect(() => {
         setID(user.uid);
 
-        firestore().collection("users").doc(veriler.ilanyapan).get().then(result => {
+        firestore().collection("users").doc(veriler.ilanyapan).get().then((result) => {
             Setcurrentuser(result.data());
             if (result.data().Takipci.indexOf(user.uid) == -1) {
                 setTakipicon('user-follow')
@@ -55,25 +55,25 @@ export default function UserProfile({ route }) {
                    setilanlarphotourl(resimler);
                    setTimeout(() => {
                        Setloading(false);
-                   }, 1500);
+                   },500);
                }
            })
            
         })
     }, [])
-    const takipet = () => {
-        firestore().collection("users").doc(veriler.ilanyapan).get().then(result => {
+    const takipet = async () => {
+       await firestore().collection("users").doc(veriler.ilanyapan).get().then(async (result) => {
             let takipcidizi = result.data().Takipci;
             if (takipcidizi.indexOf(user.uid) == -1) {
                 takipcidizi.push(user.uid);
-                firestore().collection("users").doc(veriler.ilanyapan).update({
+                await firestore().collection("users").doc(veriler.ilanyapan).update({
                     Takipci: takipcidizi,
-                }).then(() => {
+                }).then(async () => {
                     console.log("Takipçi Başarıyla Eklendi");
-                    firestore().collection("users").doc(user.uid).get().then(Takipdizi=>{
+                    await firestore().collection("users").doc(user.uid).get().then(async (Takipdizi)=>{
                         let takipekle = Takipdizi.data().Takip;
                         takipekle.push(veriler.ilanyapan);
-                        firestore().collection("users").doc(user.uid).update({
+                        await firestore().collection("users").doc(user.uid).update({
                             Takip:takipekle,
                         })
                         console.log("Takip Başarıyla Eklendi")
@@ -88,20 +88,20 @@ export default function UserProfile({ route }) {
             }
         })
     }
-    const TakiptenCikar = () => {
-        firestore().collection("users").doc(veriler.ilanyapan).get().then(result => {
+    const TakiptenCikar = async () => {
+       await firestore().collection("users").doc(veriler.ilanyapan).get().then(async (result) => {
             let takipcidizi = result.data().Takipci;
             const index = takipcidizi.indexOf(user.uid);
             takipcidizi.splice(index, 1);
-            firestore().collection("users").doc(veriler.ilanyapan).update({
+            await firestore().collection("users").doc(veriler.ilanyapan).update({
                 Takipci: takipcidizi,
-            }).then(() => {
+            }).then(async() => {
                 console.log("Takipçi Başarıyla Kaldırıldı");
-                firestore().collection("users").doc(user.uid).get().then(Takipdizi=>{
+                await firestore().collection("users").doc(user.uid).get().then(async (Takipdizi)=>{
                     let takipekle = Takipdizi.data().Takip;
                     const index = takipekle.indexOf(user.uid);
                     takipekle.splice(index, 1);
-                    firestore().collection("users").doc(user.uid).update({
+                   await firestore().collection("users").doc(user.uid).update({
                         Takip:takipekle,
                     })
                     console.log("Takip Başarıyla Kaldırıldı")

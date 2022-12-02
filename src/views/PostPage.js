@@ -4,6 +4,7 @@ import { Avatar, Button, Card, Title, Paragraph } from 'react-native-paper';
 import firestore from '@react-native-firebase/firestore'
 import { AuthContext } from '../navigation/AuthProvider'
 import Lottie from 'lottie-react-native';
+import storage from '@react-native-firebase/storage'
 export default PostPage = () => {
   const { user } = useContext(AuthContext);
   const [firstData, setFirstData] = useState([])
@@ -15,30 +16,11 @@ export default PostPage = () => {
   const [refresh, setrefresh] = useState(false);
   const animationProgress = React.useRef(new Animated.Value(0))
   useEffect(() => {
-
-
-    // let kopya = [];
-    //   firestore().collection("users").doc(user.uid).get().then(result=>{
-    //       setFirstData(result.data().Takip);
-    //   })
-    //   firstData.forEach(element => {
-    //        firestore().collection("ilanlar").doc(element).get().then((dizi)=>{
-    //           dizi.data().userilan.forEach((donendizi,index)=>{
-    //               kopya.push(donendizi);
-    //               if(index==(firstData.length-1))
-    //               {
-    //                 setTumilanlar(kopya);
-    //               }
-    //           })
-    //        }).catch(e=>{
-    //         console.log(e);
-    //        })
-    //   });
     firestore().collection("users").doc(user.uid).get().then(async (result) => {
       let gelenilanlar = [];
       for (let index = 0; index < result.data().Takip.length; index++) {
         await firestore().collection("ilanlar").where('ilanyapanid', "==", result.data().Takip[index]).orderBy('ilanTarihiZaman', "desc").limit(1).get().then(dizim => {
-          dizim.forEach(x => {
+          dizim.forEach(async (x) => {
             gelenilanlar.push(x.data());
           })
 
@@ -48,6 +30,7 @@ export default PostPage = () => {
         }
       }
       setTumilanlar(gelenilanlar);
+   
       if (gelenilanlar.length == 0) {
         setBos(true);
         setKontrol(true);
@@ -77,7 +60,7 @@ export default PostPage = () => {
               <Title>{item.Marka}</Title>
               <Paragraph>{item.Model}</Paragraph>
             </Card.Content>
-            <Card.Cover source={{ uri: 'https://picsum.photos/700' }} />
+            <Card.Cover source={{uri:item.Resim1}} />
             <Card.Actions>
               <Button mode="contained">Görüntüle</Button>
             </Card.Actions>
@@ -88,12 +71,17 @@ export default PostPage = () => {
   }
   const sayfayenile = async () => {
     setrefresh(true);
+    setBos(false);
+    setKontrol(false);
+    setSayi(0);
     firestore().collection("users").doc(user.uid).get().then(async (result) => {
       let gelenilanlar = [];
+      let resimler = [];
       for (let index = 0; index < result.data().Takip.length; index++) {
         await firestore().collection("ilanlar").where('ilanyapanid', "==", result.data().Takip[index]).orderBy('ilanTarihiZaman', "desc").limit(1).get().then(dizim => {
-          dizim.forEach(x => {
+          dizim.forEach(async (x) => {
             gelenilanlar.push(x.data());
+            
           })
 
         })
@@ -112,7 +100,6 @@ export default PostPage = () => {
 
     })
     setrefresh(false);
-
   }
   const loadMore = () => {
     if (kontrol != true) {
@@ -146,23 +133,24 @@ export default PostPage = () => {
     }
   }
   const dataekle = () => {
-    if (setKontrol != true) {
+    if (kontrol != true) {
       firestore().collection("users").doc(user.uid).get().then(async (result) => {
         let gelenilanlar = [];
         let sayac = 0;
         let artan = sayi;
         for (let index = 0; index < result.data().Takip.length; index++) {
-          if (Tumilanlar[sayi] != undefined) {
+          if (Tumilanlar[artan] != undefined) {
             await firestore().collection("ilanlar").where('ilanyapanid', "==", result.data().Takip[index]).orderBy("ilanTarihiZaman", "desc").startAfter(Tumilanlar[artan].ilanTarihiZaman).limit(1).get().then(querySnapshot => {
-              querySnapshot.forEach(x => {
+              querySnapshot.forEach(async (x) => {
                 Tumilanlar.push(x.data());
-                artan++;
                 sayac++;
               })
             })
+            artan++
+            console.log(artan);    
           }
           else {
-            console.log("Abi Bu dizi boş");
+            console.log("Döngü Bitti Bütün İlanlar Görüldü.");
           }
         }
         setSayi(artan);
@@ -175,6 +163,7 @@ export default PostPage = () => {
 
 
   return (
+   
     <FlatList ListFooterComponent={loadMore} refreshing={refresh} onRefresh={sayfayenile} onEndReached={dataekle} data={Tumilanlar} renderItem={(item, index) => postlarigoster(item, index)} />
   )
 }

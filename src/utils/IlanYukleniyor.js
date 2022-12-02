@@ -1,7 +1,6 @@
 import { View, Text } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import Lottie from 'lottie-react-native';
-import HomeStack from '../navigation/HomeStack';
 import { createStackNavigator } from '@react-navigation/stack';
 import { NavigationAction } from '@react-navigation/native';
 import { StackActions } from '@react-navigation/native'
@@ -18,7 +17,7 @@ export default IlanYukleniyor = ({navigation}) => {
             index++;
             if (index == 3) {
                 clearInterval(timerId);
-                navigation.navigate('HomeStack');
+                navigation.navigate("HomeStack")
             }
         }
         let timerId = setInterval(() => {

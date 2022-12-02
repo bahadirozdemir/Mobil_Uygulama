@@ -76,7 +76,7 @@ const KesfetScreen = ({ navigation }) => {
         const url = await storage().ref("Uploads/" + element.ilanyapanid + "/ilanResimleri/" + element.Begenenler + "/data1").getDownloadURL();
         resimler.push(url);
         if ((temizlen.length - 1) == i) {
-          setilanFoto(resimler);
+          setilanFoto(resimler); 
           setCheck(begenikontrol);
           setBegeniSayisi(begenisay);
           setYorumsayisi(yorumsay);
@@ -118,7 +118,7 @@ const KesfetScreen = ({ navigation }) => {
               firestore().collection("Begeniler").doc(item.Begenenler).update({
                 Begenenler: firestore.FieldValue.arrayRemove(...b)
               }).then(result => {
-                console.log("Kaldırıldı");
+
                 begenikontrol.forEach((element, index) => {
                   if (element.ilanid == item.Begenenler) {
                     begenikontrol[index].begenn = false;
@@ -244,25 +244,25 @@ const KesfetScreen = ({ navigation }) => {
     //let begenicheck = item.Begenenler.indexOf(currentuser);
     let kayitcheck = kayitdizi.indexOf(item.ilanid);
     //console.log(begenikontrol);
-    console.log(ilanFoto);
+    //console.log(ilanFoto);
     return (
 
       <View style={{ width: windowWidth, height: windowHeight, flex: 1, justifyContent: "flex-start", alignItems: "center" }}>
         {isloading == true ? (<View style={{ backgroundColor: "#252525", opacity: 0.9, width: "100%", height: "100%", position: 'absolute', zIndex: 999, justifyContent: "center", alignItems: "center" }}><Lottie source={require('../assets/125180-loader.json')} style={{ width: 200, height: 200 }} autoPlay loop /></View>) : ""}
         <View style={{ width: "100%", height: "50%",justifyContent:"center",alignItems:"center" }}>
-        <ImageBackground source={{ uri:ilanFoto[index] }} resizeMode="cover" style={{width:windowWidth,height:"100%"}} />
+        <ImageBackground source={{ uri:item.Resim1 }} resizeMode="cover" style={{width:windowWidth,height:"100%"}} />
         </View>
         <View style={{ marginTop: -30, width: "100%", height: "60%", flexDirection: "row" }}>
           <View style={{ width: "80%", backgroundColor: "#494D5F", borderTopLeftRadius: 30 }}>
 
             <View style={{ marginLeft: 15, marginTop: 50, width: "100%", height: "15%" }}>
               <Text style={{ color: "#f1f1f1", fontWeight: "bold", fontSize: 25, marginBottom: 5 }}>{item.Marka}</Text>
-              <Text style={{ color: "#f1f1f1", fontWeight: "bold", fontSize: 16 }}>{item.Model}</Text>
+              <Text style={{ color: "#f1f1f1", fontWeight: "bold", fontSize: 17 }}>{item.Model}</Text>
               <View style={{ width: "100%", height: "30%", flexDirection: "row" }}>
-                <Text style={{ color: "#f1f1f1", fontWeight: "bold", fontSize: 16 }}>{item.YakitTipi}</Text>
+                <Text style={{ color: "#f1f1f1", fontWeight: "bold", fontSize: 17 }}>{item.YakitTipi}</Text>
                 <Text> </Text>
                 <Text> </Text>
-                <Text style={{ color: "#f1f1f1", fontWeight: "bold", fontSize: 16 }}>{item.Kilometre} KM</Text>
+                <Text style={{ color: "#f1f1f1", fontWeight: "bold", fontSize: 17 }}>{item.Kilometre} KM</Text>
               </View>
               <Text style={{ color: "#f1f1f1", fontWeight: "bold", fontSize: 20 }}>{item.Fiyat}</Text>
             </View>

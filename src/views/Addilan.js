@@ -472,6 +472,7 @@ export default Addilan = ({ navigation }) => {
 
     let checkuser = false;
 
+
     const veritabaninaekle = async () => {
       await firestore().collection("ilanlar").doc(unique).set({
         ilanBaslik: values.ilanbasligi,
@@ -490,28 +491,51 @@ export default Addilan = ({ navigation }) => {
         ilanTarihiZaman: Date.now(),
         ilanyapan: x[0].ilanyapan,
         ilanyapanid: x[0].ilanyapanid,
-        ilanid:unique,
+        ilanid: unique,
         Begenenler: unique,
         Yorumlar: unique,
+        Resim1: "",
+        Resim2: "",
+        Resim3: "",
+        Resim4: ""
       }).then(async () => {
-        for(let index=0;index < 4;index++)
-            {
-              resimlerigonder(index).then(q => {   
-                console.log("Fotoğraf"+index+"Eklendi");      
-            })
-          }
+        for (let index = 0; index < 4; index++) {
+          resimlerigonder(index).then(q => {
+            console.log("Fotoğraf" + index + "Eklendi");
+            if (index == 0) {
+              firestore().collection("ilanlar").doc(unique).update({
+                Resim1: q,
+              })
+            }
+            else if (index == 1) {
+              firestore().collection("ilanlar").doc(unique).update({
+                Resim2: q,
+              })
+            }
+            else if (index == 2) {
+              firestore().collection("ilanlar").doc(unique).update({
+                Resim3: q,
+              })
+            }
+            else if (index == 3) {
+              firestore().collection("ilanlar").doc(unique).update({
+                Resim4: q,
+              })
+            }
+          })
+        }
         await firestore().collection("Yorumlar").doc(unique).set({
-          Yorumlar:[]
+          Yorumlar: []
         }).then(() => {
           console.log("Yorumlar dizisi eklendi");
         })
         await firestore().collection("Begeniler").doc(unique).set({
-          Begenenler:[]
+          Begenenler: []
         }).then(() => {
           console.log("Begeniler Dizisi Eklendi");
         })
       })
-     console.log("İlan Tamamen Yüklendi");
+      console.log("İlan Tamamen Yüklendi");
     }
     veritabaninaekle();
     resimleradi = ["Resim1", "Resim2", "Resim3", "Resim4"];
@@ -531,7 +555,7 @@ export default Addilan = ({ navigation }) => {
         })
 
       })
-  
+
     }
     whilecheck = true;
     navigation.navigate('Loadingilan');
@@ -602,7 +626,7 @@ export default Addilan = ({ navigation }) => {
                   }}><View style={errors.ilanresim4 && touched.ilanresim4 ? styles.resimkutularierror : styles.resimkutulari}>{yuklenenresim4 == false ? <Ant name="plus" size={55} color="gray" /> : <ImageBackground source={{ uri: yuklenenresim4 }} resizeMode="cover" style={{ width: "100%", height: "100%", justifyContent: "center" }} />}</View></TouchableOpacity>
                 </View>
               </View>
-              <View style={{ width: "90%", margin: 12, justifyContent: "center", alignItems: "center" }}>
+              <View style={{ width: "90%", margin: 12, flexWrap: "nowrap", justifyContent: "center", alignItems: "center" }}>
                 <Text style={{ fontSize: 17, fontWeight: "bold", marginBottom: 7 }}>İlan Başlığı</Text>
                 <TextInput
                   name="ilanbasligi"

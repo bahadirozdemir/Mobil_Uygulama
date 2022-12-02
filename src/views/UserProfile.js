@@ -18,6 +18,7 @@ export default function UserProfile({ route }) {
     const [Currentilanlar, setCurrentilanlar] = useState([])
     const [ilanlarphotoUrl, setilanlarphotourl] = useState([])
     const [Loading, Setloading] = useState(true)
+    const [id, setID] = useState()
     const veriler = route.params;
     const [visible, setVisible] = React.useState(false);
 
@@ -25,6 +26,7 @@ export default function UserProfile({ route }) {
 
     const hideDialog = () => setVisible(false);
     useEffect(() => {
+        setID(user.uid);
 
         firestore().collection("users").doc(veriler.ilanyapan).get().then(result => {
             Setcurrentuser(result.data());
@@ -91,7 +93,7 @@ export default function UserProfile({ route }) {
             let takipcidizi = result.data().Takipci;
             const index = takipcidizi.indexOf(user.uid);
             takipcidizi.splice(index, 1);
-            firestore().collection("users").doc(veriler).update({
+            firestore().collection("users").doc(veriler.ilanyapan).update({
                 Takipci: takipcidizi,
             }).then(() => {
                 console.log("Takipçi Başarıyla Kaldırıldı");
@@ -124,12 +126,12 @@ export default function UserProfile({ route }) {
                     <View style={styles.profileImage}>
                         <Image source={{ uri: currentuser.Photo }} style={styles.image} resizeMode="cover"></Image>
                     </View>
-                    {user.uid==veriler.ilanyapan ? "" :  
+                    {id==veriler.ilanyapan ? "" :  
                     <View style={styles.dm}>
                         <Icon name="message1" size={25} color="white" />
                     </View>
                    }
-                    {user.uid==veriler.ilanyapan ? "" :  
+                    {id==veriler.ilanyapan ? "" :  
                      <TouchableOpacity onPress={takipet} style={styles.add}>
                       <Icones name={Takipikon} size={25} color="white" />
                     </TouchableOpacity>} 

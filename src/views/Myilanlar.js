@@ -32,6 +32,12 @@ export default Myilanlar = ({ navigation }) => {
           hideDialog();
         }).catch((e) => console.log(e));
       }
+      firestore().collection("Yorumlar").doc(item.ilanid).delete().then(()=>{
+        console.log("Yorumlar Silindi");
+      })
+      firestore().collection("Begeniler").doc(item.ilanid).delete().then(()=>{
+        console.log("Beğeniler Silindi");
+      })
       let ilanbilgilerim = [];
        firestore().collection("ilanlar").where("ilanyapanid","==",user.uid).get().then((response) => {
          response.forEach(element=>{

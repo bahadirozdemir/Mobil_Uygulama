@@ -252,6 +252,7 @@ let arabalar = [
       'Laguna',
       'Megane',
       'Symbol',
+      'Kangoo'
     ]
   },
   {
@@ -348,7 +349,7 @@ let arabalar = [
 const data = [
   { label: "A", value: "1" }
 ];
-export default Addilan = ({ navigation }) => {
+export default Addilan = ({ navigation ,route}) => {
   //Gerekli State Değişkenleri
   const { user } = useContext(AuthContext);
   const [currentuser, Setcurrentuser] = useState([]);
@@ -423,6 +424,7 @@ export default Addilan = ({ navigation }) => {
   }, [])
   //İlan Ekleme Fonksiyonu
   const İlaniEkle = (values) => {
+    const premimumkontrol = route.params;
     let whilecheck = true;
     let check = 0;
     let x = [{
@@ -442,6 +444,7 @@ export default Addilan = ({ navigation }) => {
       ilanTarihi: (new Date().getDate()) + "." + (new Date().getMonth() + 1) + "." + new Date().getFullYear(),
       ilanTarihiZaman: Date.now(),
       ilanyapan: "",
+      PremiumCheck:premimumkontrol.veri,
       ilanyapanid: "",
       Begenenler: [],
       Yorumlar: [],
@@ -492,6 +495,7 @@ export default Addilan = ({ navigation }) => {
         ilanyapan: x[0].ilanyapan,
         ilanyapanid: x[0].ilanyapanid,
         ilanid: unique,
+        PremiumCheck:x[0].PremiumCheck,
         Begenenler: unique,
         Yorumlar: unique,
         Resim1: "",

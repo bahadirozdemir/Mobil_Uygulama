@@ -6,7 +6,7 @@ import Icones from 'react-native-vector-icons/SimpleLineIcons'
 import Load from '../utils/Loading'
 import firestore from '@react-native-firebase/firestore'
 import storage from '@react-native-firebase/storage'
-import { Button, Paragraph, Dialog, Portal, Provider, ActivityIndicator, MD2Colors } from 'react-native-paper';
+import { Button, Paragraph, Dialog, Portal, Provider, ActivityIndicator, MD2Colors,Snackbar} from 'react-native-paper';
 
 export default function UserProfile({ route }) {
     const { user } = useContext(AuthContext);
@@ -21,10 +21,18 @@ export default function UserProfile({ route }) {
     const [id, setID] = useState()
     const veriler = route.params;
     const [visible, setVisible] = React.useState(false);
-
+    const [messages, setMessages] = React.useState();
     const showDialog = () => setVisible(true);
 
     const hideDialog = () => setVisible(false);
+
+
+
+    const [gizle, setGizle] = React.useState(false);
+    const onToggleSnackBar = () => setGizle(!visible);
+    const onDismissSnackBar = () => setGizle(false);
+
+
     useEffect(() => {
         setID(user.uid);
 
@@ -40,29 +48,29 @@ export default function UserProfile({ route }) {
             setTakipCount(result.data().Takip.length);
         })
 
-        firestore().collection("ilanlar").where("ilanyapanid","==",veriler.ilanyapan).get().then(veri => {
-           let sayac=0;
-           veri.forEach(element => {
-              sayac++;
-           });
-           setCount(sayac);
-           let resimler = [];
-           veri.forEach(async (element, index) => {
-               const url = await storage().ref("Uploads/" + veriler.ilanyapan + "/ilanResimleri/" + element.data().ilanid + "/data0").getDownloadURL();
-               resimler.push(url);
-               if (index == (sayac-1)) {
+        firestore().collection("ilanlar").where("ilanyapanid", "==", veriler.ilanyapan).get().then(veri => {
+            let sayac = 0;
+            veri.forEach(element => {
+                sayac++;
+            });
+            setCount(sayac);
+            let resimler = [];
+            veri.forEach(async (element, index) => {
+                const url = await storage().ref("Uploads/" + veriler.ilanyapan + "/ilanResimleri/" + element.data().ilanid + "/data0").getDownloadURL();
+                resimler.push(url);
+                if (index == (sayac - 1)) {
 
-                   setilanlarphotourl(resimler);
-                   setTimeout(() => {
-                       Setloading(false);
-                   },500);
-               }
-           })
-           
+                    setilanlarphotourl(resimler);
+                    setTimeout(() => {
+                        Setloading(false);
+                    }, 500);
+                }
+            })
+
         })
     }, [])
     const takipet = async () => {
-       await firestore().collection("users").doc(veriler.ilanyapan).get().then(async (result) => {
+        await firestore().collection("users").doc(veriler.ilanyapan).get().then(async (result) => {
             let takipcidizi = result.data().Takipci;
             if (takipcidizi.indexOf(user.uid) == -1) {
                 takipcidizi.push(user.uid);
@@ -70,13 +78,15 @@ export default function UserProfile({ route }) {
                     Takipci: takipcidizi,
                 }).then(async () => {
                     console.log("Takipçi Başarıyla Eklendi");
-                    await firestore().collection("users").doc(user.uid).get().then(async (Takipdizi)=>{
+                    await firestore().collection("users").doc(user.uid).get().then(async (Takipdizi) => {
                         let takipekle = Takipdizi.data().Takip;
                         takipekle.push(veriler.ilanyapan);
                         await firestore().collection("users").doc(user.uid).update({
-                            Takip:takipekle,
+                            Takip: takipekle,
                         })
                         console.log("Takip Başarıyla Eklendi")
+                        setGizle(true);
+                        setMessages("Takip Başarıyla Eklendi");
                     })
                     setTakipicon('user-unfollow')
                     setTakipciCount(result.data().Takipci.length);
@@ -89,22 +99,24 @@ export default function UserProfile({ route }) {
         })
     }
     const TakiptenCikar = async () => {
-       await firestore().collection("users").doc(veriler.ilanyapan).get().then(async (result) => {
+        await firestore().collection("users").doc(veriler.ilanyapan).get().then(async (result) => {
             let takipcidizi = result.data().Takipci;
             const index = takipcidizi.indexOf(user.uid);
             takipcidizi.splice(index, 1);
             await firestore().collection("users").doc(veriler.ilanyapan).update({
                 Takipci: takipcidizi,
-            }).then(async() => {
+            }).then(async () => {
                 console.log("Takipçi Başarıyla Kaldırıldı");
-                await firestore().collection("users").doc(user.uid).get().then(async (Takipdizi)=>{
+                await firestore().collection("users").doc(user.uid).get().then(async (Takipdizi) => {
                     let takipekle = Takipdizi.data().Takip;
                     const index = takipekle.indexOf(user.uid);
                     takipekle.splice(index, 1);
-                   await firestore().collection("users").doc(user.uid).update({
-                        Takip:takipekle,
+                    await firestore().collection("users").doc(user.uid).update({
+                        Takip: takipekle,
                     })
-                    console.log("Takip Başarıyla Kaldırıldı")
+                    console.log("Takip Başarıyla Kaldırıldı");
+                    setGizle(true);
+                    setMessages("Takip Başarıyla Kaldırıldı");
                 })
                 setTakipicon('user-follow');
                 setTakipciCount(result.data().Takipci.length);
@@ -126,21 +138,22 @@ export default function UserProfile({ route }) {
                     <View style={styles.profileImage}>
                         <Image source={{ uri: currentuser.Photo }} style={styles.image} resizeMode="cover"></Image>
                     </View>
-                    {id==veriler.ilanyapan ? "" :  
-                    <View style={styles.dm}>
-                        <Icon name="message1" size={25} color="white" />
-                    </View>
-                   }
-                    {id==veriler.ilanyapan ? "" :  
-                     <TouchableOpacity onPress={takipet} style={styles.add}>
-                      <Icones name={Takipikon} size={25} color="white" />
-                    </TouchableOpacity>} 
-                  
+                    {id == veriler.ilanyapan ? "" :
+                        <View style={styles.dm}>
+                            <Icon name="message1" size={25} color="white" />
+                        </View>
+                    }
+                    {id == veriler.ilanyapan ? "" :
+                        <TouchableOpacity onPress={takipet} style={styles.add}>
+                            <Icones name={Takipikon} size={25} color="white" />
+                        </TouchableOpacity>}
+
                 </View>
 
                 <View style={styles.infoContainer}>
-                    <Text style={[styles.text, { fontWeight: "200", fontSize: 36 }]}>{currentuser.Name=="" ? "" :currentuser.Name} {currentuser.Surname=="" ? "": currentuser.Surname}</Text>
-                    <Text style={[styles.text, { color: "#AEB5BC", fontSize: 14 }]}>Üye</Text>
+                    <Text style={[styles.text, { fontWeight: "200", fontSize: 36 }]}>{currentuser.Name == "" ? "" : currentuser.Name} {currentuser.Surname == "" ? "" : currentuser.Surname}</Text>
+                    <Text style={[styles.text, { color: "#AEB5BC", fontSize:16}]}>{currentuser.Adres=="" ? "Adres Belirtilmemiş" : currentuser.Adres}</Text>
+                    <Text style={[styles.text, { color: "#AEB5BC", fontSize:16}]}>{currentuser.Telefon=="" ? "Telefon Belirtilmemiş" : currentuser.Telefon}</Text>
                 </View>
 
                 <View style={styles.statsContainer}>
@@ -158,7 +171,7 @@ export default function UserProfile({ route }) {
                     </View>
                 </View>
 
-                {Loading == true ? (<View style={{ marginTop: 32, width: "100%",justifyContent: "center", alignItems: "center" }}><ActivityIndicator animating={true} color={MD2Colors.red800} /></View>) : (<View style={{ marginTop: 32, width: "100%", justifyContent: "flex-start", alignItems: "center", flexDirection: "row", flexWrap: "wrap" }}>
+                {Loading == true ? (<View style={{ marginTop: 32, width: "100%", justifyContent: "center", alignItems: "center" }}><ActivityIndicator animating={true} color={MD2Colors.red800} /></View>) : (<View style={{ marginTop: 32, width: "100%", justifyContent: "flex-start", alignItems: "center", flexDirection: "row", flexWrap: "wrap" }}>
                     {
                         ilanlarphotoUrl.map((element, value) => (
                             <View key={value} style={styles.mediaImageContainer}>
@@ -174,7 +187,7 @@ export default function UserProfile({ route }) {
                 <Provider>
                     <View>
                         <Portal>
-                            <Dialog style={{backgroundColor:"white"}} visible={visible} onDismiss={hideDialog}>
+                            <Dialog style={{ backgroundColor: "white" }} visible={visible} onDismiss={hideDialog}>
                                 <Dialog.Title>Uyarı</Dialog.Title>
                                 <Dialog.Content>
                                     <Paragraph>Bu Kullanıcıyı Takip Etmeyi Bırakmak İstediğinize Emin Misiniz?</Paragraph>
@@ -187,6 +200,19 @@ export default function UserProfile({ route }) {
                         </Portal>
                     </View>
                 </Provider>
+                <View style={{bottom:0,width:"100%",height:50}}>
+                <Snackbar
+                    visible={gizle}
+                    onDismiss={onDismissSnackBar}
+                    action={{
+                        label: 'Tamam',
+                        onPress: () => {
+                            setGizle(false);
+                        },
+                    }}>
+                    {messages}
+                </Snackbar>
+                </View>
             </ScrollView>
         </SafeAreaView>
     );

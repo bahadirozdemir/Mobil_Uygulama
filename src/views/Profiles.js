@@ -76,8 +76,9 @@ const Profil = ({ navigation }) => {
  
     useEffect(() => {
         firestore().collection('users').doc(user.uid).onSnapshot(documentSnapshot => {
-            Setcurrentuser(documentSnapshot.data());
+            Setcurrentuser(documentSnapshot.data());          
         })
+        
     }, [])
 
 
@@ -90,7 +91,7 @@ const Profil = ({ navigation }) => {
                 <ImageBackground source={{ uri: 'https://i.pinimg.com/originals/01/47/bf/0147bfd9753a8633861c9905f6c0f89e.jpg' }} resizeMode="cover" style={styles.image}></ImageBackground>
             </View>
           
-            <TouchableOpacity onPress={OpenLibrary} style={{ position: "absolute", alignSelf: "center" }}><Image style={styles.avatar} source={currentuser.Photo ? {uri:currentuser.Photo} : require('../assets/3.jpg') } /></TouchableOpacity>
+            <TouchableOpacity onPress={OpenLibrary} style={{ position: "absolute", alignSelf: "center" }}><Image style={styles.avatar} source={{uri:currentuser.Photo}} /></TouchableOpacity>
           
             <View style={styles.body}>  
                 <View style={styles.bodyContent}>

@@ -20,9 +20,19 @@ import Commentloading from '../utils/Commentloading'
 import { Formik } from 'formik';
 import Yorumlar from './Yorumlar'
 import UserProfile from './UserProfile'
-const Stack = createStackNavigator();
 
-const KesfetScreen = ({ navigation }) => {
+
+
+
+
+
+
+
+
+
+
+
+export default Kesfet = ({ navigation }) => {
   //listViewRef.initialScrollIndex(0);
 
   const { user } = useContext(AuthContext);
@@ -53,7 +63,7 @@ const KesfetScreen = ({ navigation }) => {
     begenikontrol = [];
     resimler = [];
     Setloading(true);
-    firestore().collection("ilanlar").get().then(async (veriler) => {
+    firestore().collection("ilanlar").where("PremiumCheck","==",1).get().then(async (veriler) => {
       veriler.forEach((element, sayac) => {
         temizlen.push(element.data())
       });
@@ -302,37 +312,6 @@ const KesfetScreen = ({ navigation }) => {
 
 }
 
-
-
-
-
-
-
-
-
-
-export default Kesfet = () => {
-  return (
-
-    <Stack.Navigator>
-      <Stack.Screen
-        name="KesfetScreen"
-        component={KesfetScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="Yorumlar"
-        component={Yorumlar}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="UserProfile"
-        component={UserProfile}
-        options={{ headerShown: false }}
-      />
-    </Stack.Navigator>
-  )
-}
 
 const styles = StyleSheet.create({
   container: { backgroundColor: "white" },

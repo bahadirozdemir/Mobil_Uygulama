@@ -3,7 +3,7 @@ import React, { useState, useEffect, createContext } from 'react'
 import auth from '@react-native-firebase/auth'
 import Loading from '../utils/Loading'
 import firestore from '@react-native-firebase/firestore'
-
+import storage from '@react-native-firebase/storage'
 
 export const AuthContext = createContext({});
 
@@ -41,8 +41,8 @@ export const AuthProvider = ({ children }) => {
                     try {
                         await auth().createUserWithEmailAndPassword(email, password).then(async result => {
                             var uid = result.user.uid;
+                            const url = await storage().ref("FirstUser/3.jpg").getDownloadURL();
                             await userColl.doc(uid).set({
-                                check: 1,
                                 Name: name,
                                 Surname: surname,
                                 Email: email,
@@ -50,7 +50,8 @@ export const AuthProvider = ({ children }) => {
                                 Adres: "",
                                 Ulke: "",
                                 Telefon: "",
-                                Photo: "",
+                                Photo:url,
+                                Premium:0,
                                 Takip: [],
                                 Takipci: [],
                                 KayitTarihi: (new Date().getDate() + 1) + "." + (new Date().getMonth() + 1) + "." + new Date().getFullYear()

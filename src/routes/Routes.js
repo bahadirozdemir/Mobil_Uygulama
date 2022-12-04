@@ -15,7 +15,10 @@ import IlanYukleniyor from '../utils/IlanYukleniyor'
 import SelectCountry from '../views/SelectCountry'
 import Phone from '../views/Phone'
 import Dtarihi from '../views/Dtarihi'
-
+import Tumilanlar from '../views/Tumilanlar'
+import About from '../views/About'
+import UserProfile from '../views/UserProfile'
+import Detail from '../views/Detail'
 export default Routes = () => {
   const Stack = createStackNavigator();
   const { SignOut } = useContext(AuthContext);
@@ -64,9 +67,29 @@ export default Routes = () => {
           options={{ headerShown: false }}
         />
         <Stack.Screen
+          name='UserProfile'
+          component={UserProfile}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen
           name='Addilan'
           component={Addilan}
           options={{ title: 'İlan Ekle' }}
+        />
+         <Stack.Screen
+          name='Detail'
+          component={Detail}
+          options={{ title: 'İlan Detayları' }}
+        />
+          <Stack.Screen
+          name='Tumilanlar'
+          component={Tumilanlar}
+          options={{ title: 'Tüm İlanlar' }}
+        />
+          <Stack.Screen
+          name='About'
+          component={About}
+          options={{ title: 'Bilgilendirme' }}
         />
         <Stack.Screen
           name='Loadingilan'

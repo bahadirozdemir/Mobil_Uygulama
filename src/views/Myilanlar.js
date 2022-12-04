@@ -16,6 +16,7 @@ import storage from '@react-native-firebase/storage'
 export default Myilanlar = ({ navigation }) => {
   const { user } = useContext(AuthContext);
   const [ilandizi, setilanDizi] = useState([])
+  const [currentuser, Setcurrentuser] = useState([])
   const [refresh, setrefresh] = useState(false);
   const [er, setError] = useState();
   const [visible, setVisible] = React.useState(false);
@@ -66,7 +67,7 @@ export default Myilanlar = ({ navigation }) => {
             </Card.Content>
             <Card.Actions>
               <Button mode="contained" onPress={()=>{setmodaldizi(item);showDialog()}}>Sil</Button>
-              <Button mode="contained" onPress={() => console.log('Pressed')}>Görüntüle</Button>
+              {/* <Button mode="contained" onPress={() => console.log('Pressed')}>Görüntüle</Button> */}
             </Card.Actions>
           </Card>
         </View>
@@ -103,8 +104,12 @@ export default Myilanlar = ({ navigation }) => {
     setrefresh(false);
   }
   useEffect(() => {
+    
     const ilanlarigetir=async ()=>
     {
+     await firestore().collection("users").doc(user.uid).get().then(dizi=>{
+        Setcurrentuser(dizi.data());
+      })
      let ilanbilgilerim = [];
      await firestore().collection("ilanlar").where("ilanyapanid","==",user.uid).get().then((response) => {
         response.forEach(element=>{
@@ -132,7 +137,7 @@ export default Myilanlar = ({ navigation }) => {
             <Text style={{ color: "black", fontSize: 18 }}>İlanlarım</Text>
           </View>
           <View style={{ justifyContent: "center", alignItems: "center", width: "10%", height: "100%" }}>
-            <TouchableOpacity onPress={() => navigation.navigate('Addilan')}><Ant name="plus" size={25} color="black" /></TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate('Addilan',{veri:currentuser.Premium})}><Ant name="plus" size={25} color="black" /></TouchableOpacity>
           </View>
         </View>
       </View>

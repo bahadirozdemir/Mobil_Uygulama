@@ -15,6 +15,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Icon from 'react-native-vector-icons/Feather'
 import Icones from 'react-native-vector-icons/MaterialIcons'
 import PostIcon from 'react-native-vector-icons/MaterialCommunityIcons'
+import Ant from 'react-native-vector-icons/AntDesign'
 import UserProfile from '../views/UserProfile';
 import PostPage from '../views/PostPage';
 import Addilan from '../views/Addilan';
@@ -35,7 +36,7 @@ export default HomeStack = () => {
   const Butonm = (props) => {
     return (
       <TouchableOpacity onPress={()=>props.onPress()} style={styles.customButton}>
-        <Icones name="home" size={25} color="white" />
+        <Ant name="plus" size={25} color="white" />
       </TouchableOpacity>
     )
 

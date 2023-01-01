@@ -19,13 +19,23 @@ import Tumilanlar from '../views/Tumilanlar'
 import About from '../views/About'
 import UserProfile from '../views/UserProfile'
 import Detail from '../views/Detail'
+import Yorumlar from '../views/Yorumlar'
+import Connection from '../views/Connection'
+import Chat from '../views/Chat'
+import Messages from '../views/Messages'
+import FilterMarka from '../FilterPages/FilterMarka'
+import FilterYakit from '../FilterPages/FilterYakit'
+import Filterilan from '../views/Filterilan'
+import { Button } from 'react-native-paper'
+import Arama from '../views/Arama'
+import FilterCekis from '../FilterPages/FilterCekis'
+
 export default Routes = () => {
   const Stack = createStackNavigator();
   const { SignOut } = useContext(AuthContext);
   const { user, setUser } = useContext(AuthContext);
   const [isLoading, setisLoading] = useState(true);
   const [isInitial, setisInitial] = useState(true);
-
   function onAuthStateChanged(user) {
     setUser(user);
     if (isInitial) {
@@ -41,6 +51,10 @@ export default Routes = () => {
   if (isLoading == true) {
     return <Loading />
   }
+  // if(x==true)
+  // {
+  //   return <Connection/>
+  // }
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -84,6 +98,18 @@ export default Routes = () => {
           <Stack.Screen
           name='Tumilanlar'
           component={Tumilanlar}
+          options={{headerTitle:"Tüm İlanlar",headerTitleAlign:"center",  headerStyle: {
+            backgroundColor:'#32628d',borderBottomWidth:0},headerTintColor: '#fff',}}
+        />
+         <Stack.Screen
+          name='Filterilan'
+          component={Filterilan}
+          options={{headerTitle:"Filtreli İlanlar",headerTitleAlign:"center",  headerStyle: {
+            backgroundColor:'#32628d',borderBottomWidth:0},headerTintColor: '#fff',}}
+        />
+          <Stack.Screen
+          name='Yorumlar'
+          component={Yorumlar}
           options={{ title: 'Tüm İlanlar' }}
         />
           <Stack.Screen
@@ -106,13 +132,67 @@ export default Routes = () => {
           component={Phone}
           options={{ headerShown: false }}
         />
+          <Stack.Screen
+          name="Chat"
+          component={Chat}
+          options={{headerTitle:"Sohbetler",headerTitleAlign:"center"}}
+        />
         <Stack.Screen
           name="Dtarihi"
           component={Dtarihi}
           options={{ headerShown: false }}
         />
+        <Stack.Screen
+          name="Messages"
+          component={Messages}
+          options={{headerTitle:"Sohbet",headerTitleAlign:"center"}}
+        />
+        <Stack.Screen
+          name="FilterMarka"
+          component={FilterMarka}
+          options={{headerTitle:"Marka",headerTitleAlign:"center",
+          headerStyle: {
+            backgroundColor:'#32628d',
+          },headerTintColor: '#fff'
+          }}
+          
+        />
+        <Stack.Screen
+          name="Arama"
+          component={Arama}
+          options={{headerTitle:"İlan Arayın",headerTitleAlign:"center",
+          headerStyle: {
+            backgroundColor:'#32628d',
+          },headerTintColor: '#fff'
+          }}
+          
+        />
+         <Stack.Screen
+          name="FilterCekis"
+          component={FilterCekis}
+          options={{headerTitle:"Çekiş",headerTitleAlign:"center",
+          headerStyle: {
+            backgroundColor:'#32628d',
+          },headerTintColor: '#fff'
+          }}
+         
+          
+        />
+         <Stack.Screen
+          name="FilterYakit"
+          component={FilterYakit}
+          options={{headerTitle:"Yakıt",headerTitleAlign:"center",
+          headerStyle: {
+            backgroundColor:'#32628d',
+          },headerTintColor: '#fff'
+          }}
+          
+        />
+       
       </Stack.Navigator>
+      
     </NavigationContainer>
+   
   )
 }
 

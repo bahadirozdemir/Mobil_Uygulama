@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, Alert, Image,StyleSheet } from 'react-native'
+import { View, Text, TouchableOpacity, Alert, Image, StyleSheet } from 'react-native'
 import { React } from 'react'
 import { useContext, useEffect, useState } from 'react'
 import { AuthContext, AuthProvider } from './AuthProvider';
@@ -20,22 +20,26 @@ import UserProfile from '../views/UserProfile';
 import PostPage from '../views/PostPage';
 import Addilan from '../views/Addilan';
 import Myilanlar from '../views/Myilanlar';
+import Chat from '../views/Chat';
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 export default HomeStack = () => {
-  const screenOptions = {
+  const ayarlar = {
+ 
+  
+ 
     headerShown: false,
     tabBarShowLabel: false,
     tabBarStyle: {
       //position:"absolute",
-      height: 50,
+      height:50,
       backgroundColor: "white",
     }
   }
   const Butonm = (props) => {
     return (
-      <TouchableOpacity onPress={()=>props.onPress()} style={styles.customButton}>
+      <TouchableOpacity onPress={() => props.onPress()} style={styles.customButton}>
         <Ant name="plus" size={25} color="white" />
       </TouchableOpacity>
     )
@@ -44,7 +48,7 @@ export default HomeStack = () => {
   return (
 
     <Tab.Navigator initialRouteName='AnaSayfa'
-      screenOptions={screenOptions}
+      screenOptions={ayarlar}
     >
 
       <Tab.Screen
@@ -57,8 +61,8 @@ export default HomeStack = () => {
             <Icones name="home" size={size} color={color} />
           )
         }} />
-     
-        <Tab.Screen
+
+      <Tab.Screen
         name="PostPage"
         component={PostPage}
         options={{
@@ -68,11 +72,11 @@ export default HomeStack = () => {
             <PostIcon name="post" size={size} color={color} />
           )
         }} />
-        <Tab.Screen
+      <Tab.Screen
         name="Myilanlar"
         component={Myilanlar}
         options={{
-         tabBarButton:(props)=><Butonm {...props}/>
+          tabBarButton: (props) => <Butonm {...props} />
         }} />
       {<Tab.Screen
         name="Kesfet"
@@ -94,6 +98,7 @@ export default HomeStack = () => {
             <Icon name="user" size={size} color={color} />
           )
         }} />
+          
 
     </Tab.Navigator>
 
@@ -102,12 +107,12 @@ export default HomeStack = () => {
 const styles = StyleSheet.create({
   customButton: {
     backgroundColor: "#D61C4E",
-    height:60,
-    width:60,
+    height: 60,
+    width: 60,
     borderRadius: 80,
-    position:"relative",
-    justifyContent:"center",
-    alignItems:"center",
-    bottom:15,
+    position: "relative",
+    justifyContent: "center",
+    alignItems: "center",
+    bottom: 15,
   }
 });

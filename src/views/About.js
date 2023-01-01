@@ -6,10 +6,12 @@ import {
     View,
     Image,
     Alert,
+    Dimensions
   } from "react-native";
   import firestore from '@react-native-firebase/firestore'
   import React,{useContext} from "react";
 import { AuthContext } from "../navigation/AuthProvider";
+import { ScrollView } from "react-native-gesture-handler";
   
   const About = () => {
     const {user} =useContext(AuthContext);
@@ -25,10 +27,11 @@ import { AuthContext } from "../navigation/AuthProvider";
       await firestore().collection("users").doc(user.uid).update({
         Premium:1
       }).then(response =>{
-         alert("Artık Premimum Üyesiniz Tebrikler");
+         alert("Artık Premimum Üyesiniz Tebrikler"); 
       })
     }
     return (
+      <ScrollView>
       <View style={styles.aboutContainer}>
         <Text style={styles.mainHeader}>Merhaba Sahibinden.Com 'a Hoşgeldin</Text>
         <Text style={styles.paraStyle}>ilanın için fırsatları öğrenme vakti ! </Text>
@@ -79,13 +82,17 @@ import { AuthContext } from "../navigation/AuthProvider";
         <Text style={styles.mainHeader}>META ve Sahibinden.com İş Birliği</Text>
         <TouchableOpacity onPress={()=>PremiumAl()} style={{width:"80%",height:50,backgroundColor:"#f1db27",justifyContent:"center",alignItems:"center",borderRadius:20}}><Text style={{fontSize:18,fontWeight:"bold"}}>Premium Üyelik Al</Text></TouchableOpacity>
       </View>
+      </ScrollView>
     );
   };
-  
+  const windowWidth = Dimensions.get('window').width;
+  const windowHeight = Dimensions.get('window').height;
   const styles = StyleSheet.create({
     aboutContainer: {
       display: "flex",
       alignItems: "center",
+      width:windowWidth,
+      height:windowHeight,
     },
   
     imgStyle: {

@@ -4,23 +4,36 @@ import auth from '@react-native-firebase/auth'
 import Loading from '../utils/Loading'
 import firestore from '@react-native-firebase/firestore'
 import storage from '@react-native-firebase/storage'
-
+import { Snackbar } from 'react-native-paper';
 export const AuthContext = createContext({});
-
+import NetInfo from "@react-native-community/netinfo";
+import Routes from '../routes/Routes'
 export const AuthProvider = ({ children }) => {
+    const [gizle, setGizle] = React.useState(true);
+    const onToggleSnackBar = () => setGizle(!visible);
+    const onDismissSnackBar = () => setGizle(false);
     const [user, setUser] = useState(null);
     const [arttir, setArttir] = useState(0);
     const [control, setControl] = useState(false);
+    const [internetCheck, setinternetCheck] = useState(false);
     const [checkcont, setcheckcont] = useState();
     const userColl = firestore().collection("users");
+    useEffect(() => {
+        setTimeout(() => {
+            setGizle(true);
+        },1000);
+        NetInfo.addEventListener(state => {
+            setinternetCheck(state.isConnected);          
+            //console.log(state.isConnected);
+        })
+    }, [gizle])
     if (control == true) {
         return <Loading />
     }
     return (
         <AuthContext.Provider
             value={{
-                user, setUser,
-
+                user, setUser,internetCheck,
                 login: async (email, password) => {
 
                     setControl(true);
@@ -50,8 +63,8 @@ export const AuthProvider = ({ children }) => {
                                 Adres: "",
                                 Ulke: "",
                                 Telefon: "",
-                                Photo:url,
-                                Premium:0,
+                                Photo: url,
+                                Premium: 0,
                                 Takip: [],
                                 Takipci: [],
                                 KayitTarihi: (new Date().getDate() + 1) + "." + (new Date().getMonth() + 1) + "." + new Date().getFullYear()
@@ -86,6 +99,22 @@ export const AuthProvider = ({ children }) => {
                 },
             }}>
             {children}
+            {internetCheck==false ?
+                <View style={{ position: "absolute", bottom: 60, width: "100%", height: 50 }}>
+                    <Snackbar
+                        visible={gizle}
+                        onDismiss={onDismissSnackBar}
+                        action={{
+                            label: 'Tamam',
+                            onPress: () => {
+                                setGizle(false);
+                            },
+                        }}>
+                        İnternet Bağlantısı Yok
+                    </Snackbar>
+                </View> : ""
+            }
+
         </AuthContext.Provider>
 
 

@@ -35,7 +35,7 @@ import UserProfile from './UserProfile'
 export default Kesfet = ({ navigation }) => {
   //listViewRef.initialScrollIndex(0);
 
-  const { user } = useContext(AuthContext);
+  const { user,internetCheck } = useContext(AuthContext);
   const [currentuser, Setcurrentuser] = useState(null)
   const [yorumdizi, setYorumlar] = useState([])
   const [postlar, setPost] = useState([])
@@ -94,11 +94,14 @@ export default Kesfet = ({ navigation }) => {
       });
       setPost(temizlen);
       setTimeout(() => {
-        Setloading(false);
+        if(internetCheck!=false)
+        {
+          Setloading(false);
+        }     
       }, 1500);
     })
 
-  }, [yenilen])
+  }, [yenilen,internetCheck])
   const sayfayenile = () => {
     setYenilen(!yenilen);
   }
@@ -250,17 +253,17 @@ export default Kesfet = ({ navigation }) => {
   const ilanKesfet = ({ item, index }) => {
     //console.log(begenikontrol);
     const windowWidth = Dimensions.get('window').width;
-    const windowHeight = Dimensions.get('window').height - 80;
+    const windowHeight = Dimensions.get('window').height;
     //let begenicheck = item.Begenenler.indexOf(currentuser);
     let kayitcheck = kayitdizi.indexOf(item.ilanid);
     //console.log(begenikontrol);
     //console.log(ilanFoto);
     return (
-
-      <View style={{ width: windowWidth, height: windowHeight, flex: 1, justifyContent: "flex-start", alignItems: "center" }}>
+ 
+      <View style={{ width: "100%", height:windowHeight-50}}>
         {isloading == true ? (<View style={{ backgroundColor: "#252525", opacity: 0.9, width: "100%", height: "100%", position: 'absolute', zIndex: 999, justifyContent: "center", alignItems: "center" }}><Lottie source={require('../assets/125180-loader.json')} style={{ width: 200, height: 200 }} autoPlay loop /></View>) : ""}
-        <View style={{ width: "100%", height: "50%",justifyContent:"center",alignItems:"center" }}>
-        <ImageBackground source={{ uri:item.Resim1 }} resizeMode="cover" style={{width:windowWidth,height:"100%"}} />
+        <View style={{ width: "100%", height:"50%",justifyContent:"center",alignItems:"center" }}>
+        <ImageBackground source={{ uri:item.Resim1 }} resizeMode="cover" style={{width:"100%",height:"100%"}} />
         </View>
         <View style={{ marginTop: -30, width: "100%", height: "60%", flexDirection: "row" }}>
           <View style={{ width: "80%", backgroundColor: "#494D5F", borderTopLeftRadius: 30 }}>
@@ -299,7 +302,7 @@ export default Kesfet = ({ navigation }) => {
           <View style={{ padding: 7 }}><Text style={{ color: "#f1f1f1", fontSize: 14 }}>{item.ilanBaslik}</Text></View>
         </View>
       </View>
-
+ 
     )
 
   }

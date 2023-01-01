@@ -99,12 +99,8 @@ const countries =
         [],
     ];
 
-const Stack=createStackNavigator();
+export default SelectCountry = ({navigation}) => {
 
-
-const Country=({navigation})=>{
-
-    
     const [deger, SetDeger] = useState(null);
     const [ilce, Setilce] = useState(null);
     const [sayi, Setsayi] = useState(81);
@@ -169,18 +165,6 @@ const Country=({navigation})=>{
             </View>
         </View>
     )
-}    
-export default SelectCountry = () => {
-
-    return (
-   <Stack.Navigator>
-    <Stack.Screen
-    name="Country"
-    component={Country}
-    options={{ headerShown: false }}
-    />
-   </Stack.Navigator>
-)
 }
 
 const styles = StyleSheet.create({

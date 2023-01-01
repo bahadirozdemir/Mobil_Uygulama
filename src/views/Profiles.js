@@ -1,5 +1,5 @@
 import React, { Component, useContext, useEffect, useState } from 'react';
-import { StyleSheet, Text, View, Image,ScrollView,TouchableOpacity, ImageBackground, Button, PermissionsAndroid } from 'react-native';
+import { StyleSheet, Text, View, Image, ScrollView, TouchableOpacity, ImageBackground, Button, PermissionsAndroid } from 'react-native';
 import { AuthContext } from '../navigation/AuthProvider';
 import firestore from '@react-native-firebase/firestore';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -10,7 +10,7 @@ import Myilanlar from './Myilanlar'
 import Ant from 'react-native-vector-icons/AntDesign'
 import storage from '@react-native-firebase/storage'
 import { utils } from '@react-native-firebase/app';
- 
+
 const ImagePicker = require('react-native-image-picker');
 const Drawer = createDrawerNavigator();
 const Stack = createStackNavigator();
@@ -20,12 +20,25 @@ let options = {
 }
 const Profil = ({ navigation }) => {
 
+
     const [currentuser, Setcurrentuser] = useState([]);
     const [Uploading, SetUploading] = useState(false);
+    const [ProfilPhoto, setProfilPhoto] = useState();
     const [UpTask, SetUpTask] = useState();
     const [Donen, SetDonen] = useState(false);
     const [downloadurl, setDownloadurl] = useState();
+    const [yenile, setYenile] = useState(false);
     const { SignOut, user } = useContext(AuthContext);
+    useEffect(() => {
+        navigation.addListener('focus', async () => {
+            await firestore().collection('users').doc(user.uid).get().then(documentSnapshot => {
+                Setcurrentuser(documentSnapshot.data());
+                setProfilPhoto(documentSnapshot.data().Photo);
+            })
+        });
+    }, [])
+
+
 
     //Kamera kullanılmak istenirse // 
     // const OpenCamera=async ()=>{
@@ -56,15 +69,16 @@ const Profil = ({ navigation }) => {
         ImagePicker.launchImageLibrary({ mediaType: "photo" }, (response) => {
             if (!response.didCancel) {
                 SetUploading(true);
-                const ref = storage().ref("Uploads/" + user.uid+"/ProfilFoto");
+                const ref = storage().ref("Uploads/" + user.uid + "/ProfilFoto");
                 const task = ref.putFile(response.assets[0].uri);
                 task.then(async (cevap) => {
-                    const url = await storage().ref("Uploads/" + user.uid+"/ProfilFoto").getDownloadURL();
+                    const url = await storage().ref("Uploads/" + user.uid + "/ProfilFoto").getDownloadURL();
 
                     firestore().collection("users").doc(user.uid).update({
                         Photo: url
-                    }).then(() => {
+                    }).then(async () => {
                         console.log("Fotoğraf Başarıyla Yüklendi.");
+                        setProfilPhoto(url);
                     })
                 })
             }
@@ -73,59 +87,54 @@ const Profil = ({ navigation }) => {
     }
 
 
- 
-    useEffect(() => {
-        firestore().collection('users').doc(user.uid).onSnapshot(documentSnapshot => {
-            Setcurrentuser(documentSnapshot.data());          
-        })
-        
-    }, [])
+
+
 
 
 
     return (
-        
-       <ScrollView>
-        <View style={styles.container}>   
-            <View style={styles.header}>
-                <ImageBackground source={{ uri: 'https://i.pinimg.com/originals/01/47/bf/0147bfd9753a8633861c9905f6c0f89e.jpg' }} resizeMode="cover" style={styles.image}></ImageBackground>
-            </View>
-          
-            <TouchableOpacity onPress={OpenLibrary} style={{ position: "absolute", alignSelf: "center" }}><Image style={styles.avatar} source={{uri:currentuser.Photo}} /></TouchableOpacity>
-          
-            <View style={styles.body}>  
-                <View style={styles.bodyContent}>
-                    <Text style={styles.name}>{currentuser.Name} {currentuser.Surname}</Text>
-                    <Text style={styles.info}>Üye</Text>
+
+        <ScrollView>
+            <View style={styles.container}>
+                <View style={styles.header}>
+                    <ImageBackground source={{ uri: 'https://i.pinimg.com/originals/01/47/bf/0147bfd9753a8633861c9905f6c0f89e.jpg' }} resizeMode="cover" style={styles.image}></ImageBackground>
+                </View>
+
+                <TouchableOpacity onPress={OpenLibrary} style={{ position: "absolute", alignSelf: "center" }}><Image style={styles.avatar} source={{ uri: ProfilPhoto}} /></TouchableOpacity>
+
+                <View style={styles.body}>
+                    <View style={styles.bodyContent}>
+                        <Text style={styles.name}>{currentuser.Name} {currentuser.Surname}</Text>
+                        <Text style={styles.info}>Üye</Text>
+                    </View>
+
+                </View>
+
+
+                <View style={{ alignItems: "center", justifyContent: "center" }}>
+
+                    <View style={styles.informations}>
+                        <View style={{ alignItems: "center", justifyContent: "center", flexDirection: "row", width: "100%" }}><Text style={styles.ininformations}><Text style={{ fontWeight: "bold" }}> Doğum Tarihi : </Text> {currentuser.Dtarihi ? currentuser.Dtarihi : "Belirtilmemiş"} </Text><TouchableOpacity onPress={() => navigation.navigate('Dtarihi')}><Text style={styles.inininformations}>Değiştir</Text></TouchableOpacity></View>
+                        <View style={{ alignItems: "center", justifyContent: "center", flexDirection: "row", width: "100%" }}><Text style={styles.ininformations}><Text style={{ fontWeight: "bold" }}> İl / İlçe : </Text> {currentuser.Adres ? currentuser.Adres : "Belirtilmemiş"} </Text><TouchableOpacity onPress={() => navigation.navigate('SelectCountry')}><Text style={styles.inininformations}>Değiştir</Text></TouchableOpacity></View>
+                        <View style={{ alignItems: "center", justifyContent: "center", flexDirection: "row", width: "100%" }}><Text style={styles.ininformations}><Text style={{ fontWeight: "bold" }}> Telefon : </Text> {currentuser.Telefon ? currentuser.Telefon : "Belirtilmemiş"} </Text><TouchableOpacity onPress={() => navigation.navigate('Phone')}><Text style={styles.inininformations}>Değiştir</Text></TouchableOpacity></View>
+                        <View style={{ alignItems: "center", justifyContent: "center", flexDirection: "row", width: "100%" }}><Text style={styles.ininformations}><Text style={{ fontWeight: "bold" }}> Ülke : </Text>Türkiye</Text><TouchableOpacity onPress={() => alert("Sahibinden.com Şu an sadece Türkiye'de Hizmet Vermektedir.")}><Text style={styles.inininformations}>Değiştir</Text></TouchableOpacity></View>
+                    </View>
+
+                </View>
+
+                <View style={{ alignItems: "center" }}>
+                    <Text style={{ fontSize: 15, fontWeight: "bold" }}>{currentuser.KayitTarihi} Tarihinden Beri Bizimle Birliktesiniz</Text>
+                    <View style={styles.button}>
+
+                        <Button
+                            title="Çıkış Yap"
+                            color="#B7950B"
+                            onPress={() => { SignOut() }}
+                        />
+                    </View>
                 </View>
 
             </View>
-             
-          
-            <View style={{ alignItems: "center", justifyContent: "center" }}>
-             
-                <View style={styles.informations}>
-                    <View style={{ alignItems: "center", justifyContent: "center", flexDirection: "row", width: "100%" }}><Text style={styles.ininformations}><Text style={{ fontWeight: "bold" }}> Doğum Tarihi : </Text> {currentuser.Dtarihi ? currentuser.Dtarihi : "Belirtilmemiş"} </Text><TouchableOpacity onPress={() => navigation.navigate('Dtarihi')}><Text style={styles.inininformations}>Değiştir</Text></TouchableOpacity></View>
-                    <View style={{ alignItems: "center", justifyContent: "center", flexDirection: "row", width: "100%" }}><Text style={styles.ininformations}><Text style={{ fontWeight: "bold" }}> İl / İlçe : </Text> {currentuser.Adres ? currentuser.Adres : "Belirtilmemiş"} </Text><TouchableOpacity onPress={() => navigation.navigate('SelectCountry')}><Text style={styles.inininformations}>Değiştir</Text></TouchableOpacity></View>
-                    <View style={{ alignItems: "center", justifyContent: "center", flexDirection: "row", width: "100%" }}><Text style={styles.ininformations}><Text style={{ fontWeight: "bold" }}> Telefon : </Text> {currentuser.Telefon ? currentuser.Telefon : "Belirtilmemiş"} </Text><TouchableOpacity onPress={() => navigation.navigate('Phone')}><Text style={styles.inininformations}>Değiştir</Text></TouchableOpacity></View>
-                    <View style={{ alignItems: "center", justifyContent: "center", flexDirection: "row", width: "100%" }}><Text style={styles.ininformations}><Text style={{ fontWeight: "bold" }}> Profil Fotoğrafı : </Text> {currentuser.Ulke ? currentuser.Ulke : "Belirtilmemiş"} </Text><TouchableOpacity onPress={() => alert("Sahibinden.com Şu an sadece Türkiye'de Hizmet Vermektedir.")}><Text style={styles.inininformations}>Değiştir</Text></TouchableOpacity></View>
-                </View>
-              
-            </View>
-          
-            <View style={{ alignItems: "center" }}>
-                <Text style={{ fontSize: 15, fontWeight: "bold" }}>{currentuser.KayitTarihi} Tarihinden Beri Bizimle Birliktesiniz</Text>
-                <View style={styles.button}>
-
-                    <Button
-                        title="Çıkış Yap"
-                        color="#B7950B"
-                        onPress={() => { SignOut() }}
-                    />
-                </View>
-            </View>
-
-        </View>
         </ScrollView>
     )
 }
@@ -145,7 +154,7 @@ export default Profiles = () => {
                         />
                     ),
                 }} name='Profil' component={Profil} />
-                <Drawer.Screen
+            <Drawer.Screen
                 options={{
                     drawerLabel: "İlanlarım",
                     headerShown: false,
@@ -169,8 +178,9 @@ export default Profiles = () => {
                         />
                     ),
                 }} name='Kaydedilenler' component={Kaydedilenler} />
-
+ 
         </Drawer.Navigator>
+      
     )
 }
 

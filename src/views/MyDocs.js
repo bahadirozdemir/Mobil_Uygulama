@@ -16,7 +16,6 @@ import { Searchbar } from 'react-native-paper';
 import PostIcon from 'react-native-vector-icons/MaterialCommunityIcons'
 import Octi from 'react-native-vector-icons/Octicons'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import { Avatar } from 'react-native-paper';
 const MyDocs = ({navigation}) => {
   const [currentuser, Setcurrentuser] = useState({});
   const { user } = useContext(AuthContext);
@@ -32,18 +31,18 @@ const MyDocs = ({navigation}) => {
     require('../assets/Z.png'),
     "https://firebasestorage.googleapis.com/v0/b/react-native-a20b5.appspot.com/o/Uploads%2FtHkQV7tLXnaxRYngPD1Qv05AxZb2%2FilanResimleri%2F5c9a46ce-b93a-4915-b856-f397efa49520%2Fdata0?alt=media&token=4642f412-8841-426c-99ee-db86342b754b",
     "https://firebasestorage.googleapis.com/v0/b/react-native-a20b5.appspot.com/o/Uploads%2FtHkQV7tLXnaxRYngPD1Qv05AxZb2%2FilanResimleri%2F8b5b96c3-3d1c-40b5-97a6-3fac6c264ca1%2Fdata0?alt=media&token=683784f5-e1d9-488a-84a1-0c7866c422db",
-    "https://firebasestorage.googleapis.com/v0/b/react-native-a20b5.appspot.com/o/Uploads%2Fk3BUFOM7OGPjvVpw0CfOeBtLj7r1%2FilanResimleri%2Feacc5347-cd2c-4d9a-b135-cd30ab06599e%2Fdata0?alt=media&token=dd036503-2c72-4267-9257-521f3d3e24bb"
+    "https://firebasestorage.googleapis.com/v0/b/react-native-a20b5.appspot.com/o/Uploads%2FkRRLDuNOe2RIcdHVv5GDiCTrszO2%2FilanResimleri%2Fa6edf450-1361-4d5d-b2de-0af277504264%2Fdata0?alt=media&token=79a50479-cd32-4f54-a0f7-9fb86007b913"
   ];
 
   useEffect(() => {
-    firestore().collection('users').doc(user.uid).onSnapshot(documentSnapshot => {
+    firestore().collection('users').doc(user.uid).get().then(documentSnapshot => {
       Setcurrentuser(documentSnapshot.data());
     })
   }, [])
   return (
 
     <View style={{ flex: 1, alignItems: "center", justifyContent: "flex-start" }}>
-      <View style={styles.header}><View style={{ width: "20%", height: "100%", justifyContent: "center", alignItems: "center" }}><Lottie source={require('../assets/122835-handshake.json')} style={{ width: 100, height: 100 }} autoPlay loop /></View><View style={{ width: "80%", justifyContent: "center", alignItems: "flex-start", height: "100%" }}><Text style={{ fontSize: RFValue(18), fontWeight: "bold", color: "black" }}>Sahibinden.com</Text></View></View>
+      <View style={styles.header}><View style={{ width: "20%", height: "100%", justifyContent: "center", alignItems: "center" }}><Lottie source={require('../assets/122835-handshake.json')} style={{ width: 100, height: 100 }} autoPlay loop /></View><View style={{ width: "70%",justifyContent: "center", alignItems: "flex-start", height: "100%" }}><Text style={{ fontSize: RFValue(18), fontWeight: "bold", color: "black" }}>Sahibinden.com</Text></View><View style={{width:"10%",justifyContent: "center", alignItems: "center", height: "100%" }}><TouchableOpacity onPress={()=>{navigation.navigate('Chat')}}><Ant name="message1" size={25} color="black" /></TouchableOpacity></View></View>
       <View style={{ width: "100%", height: "44%", flexDirection: "column", justifyContent: "center", alignItems: "center" }}>
         <View style={{ width: "100%", height: "20%", flexDirection: "row" }}>
           <View style={{ width: "80%", height: "100%", justifyContent: "center", alignItems: "center", flexDirection: "row", backgroundColor: "#3c92bc" }}><View style={{ flexDirection: "column", width: "100%", height: "100%", justifyContent: "center", alignItems: "flex-start" }}><Text style={{ fontSize: RFValue(17), color: "white" }}> Merhaba {currentuser.Name}</Text><Text style={{ fontSize: 13, color: "white" }}>  Üye</Text></View></View>
@@ -66,7 +65,7 @@ const MyDocs = ({navigation}) => {
       </View>
 
       <View style={{ width: "100%", justifyContent: "center", alignItems: "center", height: "37%", flexDirection: "row", padding: 12, flexWrap: "wrap" }}>
-
+   
         <View style={{ width: "100%" }}>
           <List.Item  onPress={()=>{navigation.navigate('Tumilanlar')}} style={styles.itemler} titleStyle={{ fontSize: 19,fontWeight:"bold"}} titleEllipsizeMode="middle"
             title="Tüm İlanlar"
@@ -78,16 +77,16 @@ const MyDocs = ({navigation}) => {
             description="İlanınız için öneri ve fırsatlar."
             left={() => <Ionicons name="information-circle-outline" size={55} color="#fca001" />}
           />
-           <List.Item style={styles.itemler} titleStyle={{ fontSize: 19,fontWeight:"bold"}} titleEllipsizeMode="middle"
-            title="Bize Sorun"
-            description="Aklınıza takılan bir soru mu var ? 7/24 Aktif canlı desteğimizle görüşün."
-            left={() => <Ionicons name="md-mic-circle-outline" size={55} color="#fca001" />}
+           <List.Item onPress={()=>{navigation.navigate('Arama')}} style={styles.itemler} titleStyle={{ fontSize: 19,fontWeight:"bold"}} titleEllipsizeMode="middle"
+            title="Arama Yapın"
+            description="İlan No veya İlan İsmi ile Arama Yapın."
+            left={() => <Ionicons name="search" size={55} color="#fca001" />}
           />
         </View>
 
 
       </View>
-
+   
     </View>
 
   )

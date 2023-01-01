@@ -13,10 +13,13 @@ import DatePicker from 'react-native-modern-datepicker';
 
 const Stack = createStackNavigator();
 
-const UpdateDtarih = ({navigation}) => {
+ 
+
+
+export default Sehir = ({navigation}) => {
     const [selectedDate, setSelectedDate] = useState(null);
     const {user} = useContext(AuthContext);
-    current=new Date().getFullYear()+"-"+ (new Date().getMonth()+1)+"-"+(new Date().getDate()+1);
+   
     let newdate="";
     const fonksiyon = ()=>{
        
@@ -41,6 +44,7 @@ const UpdateDtarih = ({navigation}) => {
          }
     }
 
+    current=new Date().getFullYear()+"-"+ (new Date().getMonth()+1)+"-"+(new Date().getDate()+1);
     return (
         <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
             <Text style={{ fontSize: 24 }}>Lütfen Doğum Tarihinizi Seçiniz.</Text>
@@ -61,28 +65,12 @@ const UpdateDtarih = ({navigation}) => {
                    />
                 </View>
         </View>
-    );
-};
-
-
-export default Sehir = () => {
-    return (
-        <Stack.Navigator>
-            <Stack.Screen
-                name="UpdateDtarih"
-                component={UpdateDtarih}
-                options={{ headerShown: false }}
-            />
-
-        </Stack.Navigator>
     )
 }
 
 const styles = StyleSheet.create({
 
     button2: {
-
-
         width: "100%",
         marginTop: 20,
     },

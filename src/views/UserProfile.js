@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { AuthContext } from '../navigation/AuthProvider';
-import { StyleSheet, Text, View, SafeAreaView, Image, ScrollView, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, SafeAreaView, Image, ScrollView, TouchableOpacity, AsyncStorage } from "react-native";
 import Icon from 'react-native-vector-icons/AntDesign'
 import Icones from 'react-native-vector-icons/SimpleLineIcons'
 import Load from '../utils/Loading'
@@ -8,7 +8,7 @@ import firestore from '@react-native-firebase/firestore'
 import storage from '@react-native-firebase/storage'
 import { Button, Paragraph, Dialog, Portal, Provider, ActivityIndicator, MD2Colors,Snackbar} from 'react-native-paper';
 
-export default function UserProfile({ route }) {
+export default function UserProfile({navigation,route }) {
     const { user } = useContext(AuthContext);
     const [currentuser, Setcurrentuser] = useState([]);
     const [count, setCount] = useState()
@@ -98,6 +98,34 @@ export default function UserProfile({ route }) {
             }
         })
     }
+    const MesajGonder = async () =>{
+        let sayac=0;
+        await firestore().collection("chat").get().then(x=>{
+            x.forEach(element => {
+                if(element.data().kisi1==user.uid && element.data().kisi2==veriler.ilanyapan)
+                {
+                    sayac++;
+                    return navigation.navigate("Messages",{gonderilenkisi:veriler.ilanyapan,gonderenkisi:user.uid,chatid:element.id})
+                }
+                else if(element.data().kisi2==user.uid && element.data().kisi1==veriler.ilanyapan)
+                {
+                    sayac++;
+                    return navigation.navigate("Messages",{gonderilenkisi:veriler.ilanyapan,gonderenkisi:user.uid,chatid:element.id})
+                }
+            });       
+        })
+        if(sayac==0)
+        {
+            await firestore().collection("chat").add({
+                kisi1:user.uid,
+                kisi2: veriler.ilanyapan,
+                mesajlar: []
+            }).then(docref => {
+                return navigation.navigate("Messages",{gonderilenkisi:veriler.ilanyapan,gonderenkisi:user.uid,chatid:docref.id})
+            })
+        }
+       
+    }
     const TakiptenCikar = async () => {
         await firestore().collection("users").doc(veriler.ilanyapan).get().then(async (result) => {
             let takipcidizi = result.data().Takipci;
@@ -139,9 +167,9 @@ export default function UserProfile({ route }) {
                         <Image source={{ uri: currentuser.Photo }} style={styles.image} resizeMode="cover"></Image>
                     </View>
                     {id == veriler.ilanyapan ? "" :
-                        <View style={styles.dm}>
-                            <Icon name="message1" size={25} color="white" />
-                        </View>
+                        <TouchableOpacity onPress={()=>MesajGonder()} style={styles.dm}>
+                           <Icon name="message1" size={25} color="white" />
+                        </TouchableOpacity>
                     }
                     {id == veriler.ilanyapan ? "" :
                         <TouchableOpacity onPress={takipet} style={styles.add}>
@@ -149,7 +177,6 @@ export default function UserProfile({ route }) {
                         </TouchableOpacity>}
 
                 </View>
-
                 <View style={styles.infoContainer}>
                     <Text style={[styles.text, { fontWeight: "200", fontSize: 36 }]}>{currentuser.Name == "" ? "" : currentuser.Name} {currentuser.Surname == "" ? "" : currentuser.Surname}</Text>
                     <Text style={[styles.text, { color: "#AEB5BC", fontSize:16}]}>{currentuser.Adres=="" ? "Adres Belirtilmemiş" : currentuser.Adres}</Text>
@@ -188,9 +215,9 @@ export default function UserProfile({ route }) {
                     <View>
                         <Portal>
                             <Dialog style={{ backgroundColor: "white" }} visible={visible} onDismiss={hideDialog}>
-                                <Dialog.Title>Uyarı</Dialog.Title>
+                                <Dialog.Title style={{color:"black"}}>Uyarı</Dialog.Title>
                                 <Dialog.Content>
-                                    <Paragraph>Bu Kullanıcıyı Takip Etmeyi Bırakmak İstediğinize Emin Misiniz?</Paragraph>
+                                    <Paragraph style={{color:"black"}}>Bu Kullanıcıyı Takip Etmeyi Bırakmak İstediğinize Emin Misiniz?</Paragraph>
                                 </Dialog.Content>
                                 <Dialog.Actions>
                                     <Button onPress={TakiptenCikar}>Evet</Button>

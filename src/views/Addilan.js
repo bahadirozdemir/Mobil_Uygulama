@@ -349,7 +349,7 @@ let arabalar = [
 const data = [
   { label: "A", value: "1" }
 ];
-export default Addilan = ({ navigation ,route}) => {
+export default Addilan = ({ navigation, route }) => {
   //Gerekli State Değişkenleri
   const { user } = useContext(AuthContext);
   const [currentuser, Setcurrentuser] = useState([]);
@@ -444,7 +444,7 @@ export default Addilan = ({ navigation ,route}) => {
       ilanTarihi: (new Date().getDate()) + "." + (new Date().getMonth() + 1) + "." + new Date().getFullYear(),
       ilanTarihiZaman: Date.now(),
       ilanyapan: "",
-      PremiumCheck:premimumkontrol.veri,
+      PremiumCheck: premimumkontrol.veri,
       ilanyapanid: "",
       Begenenler: [],
       Yorumlar: [],
@@ -495,7 +495,7 @@ export default Addilan = ({ navigation ,route}) => {
         ilanyapan: x[0].ilanyapan,
         ilanyapanid: x[0].ilanyapanid,
         ilanid: unique,
-        PremiumCheck:x[0].PremiumCheck,
+        PremiumCheck: x[0].PremiumCheck,
         Begenenler: unique,
         Yorumlar: unique,
         Resim1: "",
@@ -641,8 +641,8 @@ export default Addilan = ({ navigation ,route}) => {
                   value={values.ilanbasligi}
                 />
               </View>
-
-              <View style={{ width: "43%", margin: 12 }}>
+          
+              <View style={{ width: "40%", margin: 12, flexWrap: "nowrap" }}>
                 <Text style={{ fontSize: 17, fontWeight: "bold", marginBottom: 7 }}>Marka</Text>
                 <Dropdown
                   name="marka"
@@ -660,7 +660,7 @@ export default Addilan = ({ navigation ,route}) => {
                   }}
                 />
               </View>
-              <View style={{ width: "43%", margin: 12 }}>
+              <View style={{ width: "40%", margin: 12, flexWrap: "nowrap" }}>
                 <Text style={{ fontSize: 17, fontWeight: "bold", marginBottom: 7 }}>Model</Text>
                 <Dropdown
                   name="model"
@@ -676,7 +676,7 @@ export default Addilan = ({ navigation ,route}) => {
                   }}
                 />
               </View>
-              <View style={{ width: "43%", margin: 12 }}>
+              <View style={{ width: "40%", margin: 12, flexWrap: "nowrap" }}>
                 <Text style={{ fontSize: 17, fontWeight: "bold", marginBottom: 7 }}>Model Yılı</Text>
                 <Dropdown
                   name="modelyil"
@@ -692,7 +692,7 @@ export default Addilan = ({ navigation ,route}) => {
                   }}
                 />
               </View>
-              <View style={{ width: "43%", margin: 12 }}>
+              <View style={{ width: "40%", margin: 12, flexWrap: "nowrap" }}>
                 <Text style={{ fontSize: 17, fontWeight: "bold", marginBottom: 7 }}>Yakıt Tipi</Text>
                 <Dropdown
                   name="yakitipi"
@@ -708,7 +708,7 @@ export default Addilan = ({ navigation ,route}) => {
                   }}
                 />
               </View>
-              <View style={{ width: "43%", margin: 12 }}>
+              <View style={{ width: "40%", margin: 12, flexWrap: "nowrap" }}>
                 <Text style={{ fontSize: 17, fontWeight: "bold", marginBottom: 7 }}>Vites</Text>
                 <Dropdown
                   name="vites"
@@ -724,7 +724,7 @@ export default Addilan = ({ navigation ,route}) => {
                   }}
                 />
               </View>
-              <View style={{ width: "43%", margin: 12 }}>
+              <View style={{ width: "40%", margin: 12, flexWrap: "nowrap" }}>
                 <Text style={{ fontSize: 17, fontWeight: "bold", marginBottom: 7 }}>Kasa Tipi</Text>
                 <Dropdown
                   name="kasatipi"
@@ -740,7 +740,7 @@ export default Addilan = ({ navigation ,route}) => {
                   }}
                 />
               </View>
-              <View style={{ width: "43%", margin: 12 }}>
+              <View style={{ width: "40%", margin: 12, flexWrap: "nowrap" }}>
                 <Text style={{ fontSize: 17, fontWeight: "bold", marginBottom: 7 }}>Çekiş</Text>
                 <Dropdown
                   name="cekis"
@@ -756,7 +756,7 @@ export default Addilan = ({ navigation ,route}) => {
                   }}
                 />
               </View>
-              <View style={{ width: "43%", margin: 12 }}>
+              <View style={{ width: "40%", margin: 12, flexWrap: "nowrap" }}>
                 <Text style={{ fontSize: 17, fontWeight: "bold", marginBottom: 7 }}>Motor Gücü</Text>
                 <Dropdown
                   name="motorgucu"
@@ -772,7 +772,7 @@ export default Addilan = ({ navigation ,route}) => {
                   }}
                 />
               </View>
-              <View style={{ width: "43%", margin: 12 }}>
+              <View style={{ width: "40%", margin: 12, flexWrap: "nowrap" }}>
                 <Text style={{ fontSize: 17, fontWeight: "bold", marginBottom: 7 }}>Takas</Text>
                 <Dropdown
                   name="takas"
@@ -787,7 +787,7 @@ export default Addilan = ({ navigation ,route}) => {
                   }}
                 />
               </View>
-              <View style={{ width: "43%", margin: 12 }}>
+              <View style={{ width: "40%", margin: 12, flexWrap: "nowrap" }}>
                 <Text style={{ fontSize: 17, fontWeight: "bold", marginBottom: 7 }}>Kilometre</Text>
                 <CurrencyInput
                   name="kilometre"
